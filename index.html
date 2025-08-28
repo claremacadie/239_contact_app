@@ -2,6 +2,7 @@
 <html lang="end">
   <head>
     <meta charset="uft-8">
+    <link rel="stylesheet" href="./src/white_space_reset.css">
     <link rel="stylesheet" href="./src/style.css">
     <script type="module" src="./src/main.js"></script>
   </head>
@@ -10,10 +11,16 @@
       <h1>Contact Manager</h1>
     </header>
     <main>
-      <button id="add-contact">Add Contact</button>
-      <input id="search-contacts" name="name" type="text" placeholder="Search">
-      <p id="user-message"></p>
-      <p id="error-message"></p>
+      <div id="buttons">
+        <button id="add-contact">Add Contact</button>
+        <input id="search-contacts" name="name" type="text" placeholder="Search">
+      </div>
+
+      <div id="messages">
+        <p id="user-message"></p>
+        <p id="error-message"></p>
+      </div>
+      
       <div id="contact-list"></div>
     </main>
     <footer>

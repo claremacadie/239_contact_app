@@ -40,9 +40,7 @@ Classes:
   - Form
 
 To do:
-  - Add CSS whitespace reset
   - Decide if tags are free text? How will I get a list of them all? Don't over-complicate
-  - Search box: ensure Search is grey
 
 */
 
@@ -89,17 +87,19 @@ class Contact {
     this.$tagsDt.textContent = 'Tags:';
     this.$tagsDd = document.createElement('dd');
     this.$tagsDiv.append(this.$tagsDt, this.$tagsDd);
-
+    
     this.$contactDetailsDl.append(this.$phoneDiv, this.$emailDiv, this.$tagsDiv);
-
+    
+    this.$buttonsDiv = document.createElement('div');
     this.$editButton = document.createElement('button');
     this.$editButton.textContent = 'Edit';
     this.$editButton.classList.add('edit-button');
     this.$deleteButton = document.createElement('button');
     this.$deleteButton.textContent = 'Delete';
     this.$deleteButton.classList.add('delete-button');
+    this.$buttonsDiv.append(this.$editButton, this.$deleteButton)
 
-    this.$li.append(this.$nameH3, this.$contactDetailsDl, this.$editButton, this.$deleteButton);
+    this.$li.append(this.$nameH3, this.$contactDetailsDl, this.$buttonsDiv);
   }
 }
 
@@ -142,7 +142,6 @@ class App {
     this.displayAllContacts();;
   }
 }
-
 
 function main() {
   let url = "http://localhost:3000/api";

@@ -1,3 +1,22 @@
+div {
+  margin: 1em;
+}
+
+div#buttons {
+  background-color: rgb(165, 221, 221);
+  padding: 1em;
+  width: 30%;
+}
+
+h1 {
+  font-size: 16pt;
+  margin: 1em;
+}
+
+h3 {
+  margin: 1em;
+}
+
 li {
   list-style: none;
   padding-bottom: 2em;
@@ -5,18 +24,10 @@ li {
 
 dt, dd {
   display: inline;
-  margin: 0;
 }
 
-dt {
-  padding-right: 0.2em;
-}
-
-dl {
-  margin: 0;
-}
-
-h3 {
-  margin: 0;
-  padding: 0;
+button, input {
+  margin-right: 1em;
+  padding: 0.5em;
+  border-radius: 0.5em;
 }
