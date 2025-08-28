@@ -40,7 +40,7 @@ Classes:
   - Form
 
 To do:
-  - Decide how to list contacts: ul with li? divs?
+  - Add CSS whitespace reset
   - Decide if tags are free text? How will I get a list of them all? Don't over-complicate
   - Search box: ensure Search is grey
 
@@ -54,25 +54,43 @@ class Contact {
     this.phone = obj['phone-number'];
     this.tags = obj['tags'] === null ? [] : obj['tags'].split(',');
     this.init();
+    this.populateHTML();
   }
 
+  populateHTML() {
+    this.$li.dataset['contactId'] = this.id;
+    this.$nameH3.textContent = this.name;
+    this.$phoneDd.textContent = this.phone || 'None';
+    this.$emailDd.textContent = this.email || 'None';
+    this.$tagsDd.textContent = this.tags.length === 0 ? 'None' : this.tags.join(', ');
+  }
+  
   init() {
     this.$li = document.createElement('li');
-    this.$li.dataset['contactId'] = this.id;
-
+    
     this.$nameH3 = document.createElement('h3');
-    this.$nameH3.textContent = this.name;
-
+    
     this.$contactDetailsDl = document.createElement('dl');
+
+    this.$phoneDiv = document.createElement('div');
     this.$phoneDt = document.createElement('dt');
     this.$phoneDt.textContent = 'Phone Number:';
     this.$phoneDd = document.createElement('dd');
-    this.$phoneDd.textContent = this.phone;
+    this.$phoneDiv.append(this.$phoneDt, this.$phoneDd);
+    
+    this.$emailDiv = document.createElement('div');
     this.$emailDt = document.createElement('dt');
     this.$emailDt.textContent = 'Email:';
     this.$emailDd = document.createElement('dd');
-    this.$emailDd.textContent = this.email;
-    this.$contactDetailsDl.append(this.$phoneDt, this.$phoneDd, this.$emailDt, this.$emailDd);
+    this.$emailDiv.append(this.$emailDt, this.$emailDd);
+    
+    this.$tagsDiv = document.createElement('div');
+    this.$tagsDt = document.createElement('dt');
+    this.$tagsDt.textContent = 'Tags:';
+    this.$tagsDd = document.createElement('dd');
+    this.$tagsDiv.append(this.$tagsDt, this.$tagsDd);
+
+    this.$contactDetailsDl.append(this.$phoneDiv, this.$emailDiv, this.$tagsDiv);
 
     this.$editButton = document.createElement('button');
     this.$editButton.textContent = 'Edit';
@@ -109,7 +127,6 @@ class App {
   }
 
   displayAllContacts() {
-    // Iterate through contactsObj and render HTML in contactsListDiv
     this.contactsObj.forEach(contact => {
       this.$contactListDiv.append(contact.$li);
     });
