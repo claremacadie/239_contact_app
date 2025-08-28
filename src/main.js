@@ -55,6 +55,47 @@ class Contact {
     this.populateHTML();
   }
 
+  addContactDetailsDivHTML() {
+    this.$phoneDiv = document.createElement('div');
+    this.addPhoneDivHTML();
+    this.$emailDiv = document.createElement('div');
+    this.addEmailDivHTML();
+    this.$tagsDiv = document.createElement('div');
+    this.addTagsDivHTML();
+    this.$contactDetailsDl.append(this.$phoneDiv, this.$emailDiv, this.$tagsDiv);
+  }
+
+  addPhoneDivHTML() {
+    this.$phoneDt = document.createElement('dt');
+    this.$phoneDt.textContent = 'Phone Number:';
+    this.$phoneDd = document.createElement('dd');
+    this.$phoneDiv.append(this.$phoneDt, this.$phoneDd);
+  }
+
+  addEmailDivHTML() {
+    this.$emailDt = document.createElement('dt');
+    this.$emailDt.textContent = 'Email:';
+    this.$emailDd = document.createElement('dd');
+    this.$emailDiv.append(this.$emailDt, this.$emailDd);
+  }
+
+  addTagsDivHTML() {
+    this.$tagsDt = document.createElement('dt');
+    this.$tagsDt.textContent = 'Tags:';
+    this.$tagsDd = document.createElement('dd');
+    this.$tagsDiv.append(this.$tagsDt, this.$tagsDd);
+  }
+
+  addButtonsDivHTML() {
+    this.$editButton = document.createElement('button');
+    this.$editButton.textContent = 'Edit';
+    this.$editButton.classList.add('edit-button');
+    this.$deleteButton = document.createElement('button');
+    this.$deleteButton.textContent = 'Delete';
+    this.$deleteButton.classList.add('delete-button');
+    this.$buttonsDiv.append(this.$editButton, this.$deleteButton);
+  }
+
   populateHTML() {
     this.$li.dataset['contactId'] = this.id;
     this.$nameH3.textContent = this.name;
@@ -65,39 +106,12 @@ class Contact {
   
   init() {
     this.$li = document.createElement('li');
-    
-    this.$nameH3 = document.createElement('h3');
-    
-    this.$contactDetailsDl = document.createElement('dl');
 
-    this.$phoneDiv = document.createElement('div');
-    this.$phoneDt = document.createElement('dt');
-    this.$phoneDt.textContent = 'Phone Number:';
-    this.$phoneDd = document.createElement('dd');
-    this.$phoneDiv.append(this.$phoneDt, this.$phoneDd);
-    
-    this.$emailDiv = document.createElement('div');
-    this.$emailDt = document.createElement('dt');
-    this.$emailDt.textContent = 'Email:';
-    this.$emailDd = document.createElement('dd');
-    this.$emailDiv.append(this.$emailDt, this.$emailDd);
-    
-    this.$tagsDiv = document.createElement('div');
-    this.$tagsDt = document.createElement('dt');
-    this.$tagsDt.textContent = 'Tags:';
-    this.$tagsDd = document.createElement('dd');
-    this.$tagsDiv.append(this.$tagsDt, this.$tagsDd);
-    
-    this.$contactDetailsDl.append(this.$phoneDiv, this.$emailDiv, this.$tagsDiv);
-    
+    this.$nameH3 = document.createElement('h3');
+    this.$contactDetailsDl = document.createElement('dl');
+    this.addContactDetailsDivHTML();
     this.$buttonsDiv = document.createElement('div');
-    this.$editButton = document.createElement('button');
-    this.$editButton.textContent = 'Edit';
-    this.$editButton.classList.add('edit-button');
-    this.$deleteButton = document.createElement('button');
-    this.$deleteButton.textContent = 'Delete';
-    this.$deleteButton.classList.add('delete-button');
-    this.$buttonsDiv.append(this.$editButton, this.$deleteButton)
+    this.addButtonsDivHTML();
 
     this.$li.append(this.$nameH3, this.$contactDetailsDl, this.$buttonsDiv);
   }
