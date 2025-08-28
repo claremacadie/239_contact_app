@@ -36,11 +36,14 @@ Decisions:
 
 Classes:
   - App
-  - HTMLTemplate
-  - Form
+  - Contact
+  - HTMLTemplate?
+  - Form?
 
 To do:
-  - Decide if tags are free text? How will I get a list of them all? Don't over-complicate
+  - Ensure new tags are lowercase
+  - Decide if tags are free text? How will I get a list of them all? Don't over-complicate: radio button, or add new
+  - HTML class?
 
 */
 
@@ -124,7 +127,7 @@ class App {
   }
 
   async fetchContacts() {
-    let path = '/contacts';
+    let path = "/contacts";
     try {
       let response = await fetch(this.url + path);
       if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
@@ -133,6 +136,15 @@ class App {
     } catch(error) {
       console.log(error)
     }
+  }
+
+  getTagOptions() {
+    return this.contactsObj.reduce((tagOptions, contact) => {
+      contact.tags.forEach(tag => {
+        if (!tagOptions.includes(tag)) tagOptions.push(tag);
+      });
+      return tagOptions;
+    }, []).sort();
   }
 
   async createContactsObj() {
@@ -146,14 +158,42 @@ class App {
     });
   }
 
+  populateTagsDivHTML() {
+    // use this.tagOptions to create
+      //     <fieldset>
+      //   <legend>Extras (choose any)</legend>
+      //   <label><input type="checkbox" name="extras" value="gift-wrap"> Gift wrap</label>
+      //   <label><input type="checkbox" name="extras" value="note"> Handwritten note</label>
+      //   <label><input type="checkbox" name="extras" value="rush"> Rush handling</label>
+      // </fieldset>
+  }
+
+  populateButtonsDivHTML() {
+    this.$addContactButton = document.createElement('button');
+    this.$addContactButton.textContent = "Add Contact";
+
+    this.$searchInput = document.createElement('input');
+    this.$searchInput.setAttribute('type', 'text');
+    this.$searchInput.setAttribute('placeholder', 'Search');
+
+    this.$tagsDiv = document.createElement('div');
+    this.populateTagsDivHTML();
+
+    this.$buttonsDiv.append(this.$addContactButton, this.$searchInput, this.$tagsDiv);
+  }
+
   async init() {
-    this.$addContactButton = document.getElementById("add-contact");
-    this.$searchInput = document.getElementById("search-contacts");
+    this.contactsObj = await this.createContactsObj();
+    this.tagOptions = this.getTagOptions();
+    console.log(this.tagOptions)
+
+    this.$buttonsDiv = document.getElementById("buttons");
+    this.populateButtonsDivHTML();
     this.$contactListDiv = document.getElementById("contact-list");
     this.$userMessage = document.getElementById("user-message");
     this.$errorMessage = document.getElementById("error-message");
-    this.contactsObj = await this.createContactsObj();
-    this.displayAllContacts();;
+
+    this.displayAllContacts();
   }
 }
 
@@ -162,4 +202,4 @@ function main() {
   let app = new App(url);
 }
 
-document.addEventListener('DOMContentLoaded', main);
+document.addEventListener("DOMContentLoaded", main);
