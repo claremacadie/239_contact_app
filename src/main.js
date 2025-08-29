@@ -1,7 +1,7 @@
 /*
 Home page view:
   Add Contact button:
-    Form: name, phone number, email, tag
+    Form: name, phone number, email, tag (checkboxes and free text for new tag)
 
   Search input box:
     - Search name only
@@ -158,14 +158,24 @@ class App {
     });
   }
 
-  populateTagsDivHTML() {
-    // use this.tagOptions to create
-      //     <fieldset>
-      //   <legend>Extras (choose any)</legend>
-      //   <label><input type="checkbox" name="extras" value="gift-wrap"> Gift wrap</label>
-      //   <label><input type="checkbox" name="extras" value="note"> Handwritten note</label>
-      //   <label><input type="checkbox" name="extras" value="rush"> Rush handling</label>
-      // </fieldset>
+  populateTagsFieldsetHTML() {
+    this.$tagsFieldset.className = 'tags';
+    
+    let legend = document.createElement('legend');
+    legend.textContent = 'Select tags:';
+    this.$tagsFieldset.append(legend);
+
+    this.tagOptions.forEach(tagOption => {
+      let label = document.createElement('label');
+      let labelText = document.createTextNode(tagOption);
+      let input = document.createElement('input');
+      input.setAttribute('type', 'checkbox');
+      input.setAttribute('name', 'tags');
+      input.setAttribute('value', tagOption);
+      label.append(input, labelText);
+
+      this.$tagsFieldset.append(label);
+    });
   }
 
   populateButtonsDivHTML() {
@@ -173,19 +183,19 @@ class App {
     this.$addContactButton.textContent = "Add Contact";
 
     this.$searchInput = document.createElement('input');
+    this.$searchInput.className = 'search';
     this.$searchInput.setAttribute('type', 'text');
     this.$searchInput.setAttribute('placeholder', 'Search');
 
-    this.$tagsDiv = document.createElement('div');
-    this.populateTagsDivHTML();
+    this.$tagsFieldset = document.createElement('fieldset');
+    this.populateTagsFieldsetHTML();
 
-    this.$buttonsDiv.append(this.$addContactButton, this.$searchInput, this.$tagsDiv);
+    this.$buttonsDiv.append(this.$addContactButton, this.$searchInput, this.$tagsFieldset);
   }
 
   async init() {
     this.contactsObj = await this.createContactsObj();
     this.tagOptions = this.getTagOptions();
-    console.log(this.tagOptions)
 
     this.$buttonsDiv = document.getElementById("buttons");
     this.populateButtonsDivHTML();

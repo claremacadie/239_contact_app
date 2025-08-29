@@ -26,8 +26,32 @@ dt, dd {
   display: inline;
 }
 
-button, input {
+button,
+input.search {
   margin-right: 1em;
   padding: 0.5em;
   border-radius: 0.5em;
 }
+
+fieldset.tags {
+  padding-top: 1em;
+}
+
+fieldset.tags > legend {
+  float: left;
+  margin-right: .75rem;
+}
+
+fieldset.tags > label {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  margin-right: .75rem;
+}
+
+fieldset.tags::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
