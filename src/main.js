@@ -41,9 +41,19 @@ Classes:
   - Form?
 
 To do:
+  - Filter contact list based on Search box
+    - event listener, input
+    - handler:
+      - filter contact list based on names
+  - Filter contact list based on tags
+    - event listener, checkbox selected, or unselected
+      - filter contact list based on tags
+  - Ensure both filters work together
+
   - Ensure new tags are lowercase
-  - Decide if tags are free text? How will I get a list of them all? Don't over-complicate: radio button, or add new
   - HTML class?
+  - When should data be fetched? What if other people are adding contacts?
+  - App class: bind is inside init because init has an await call and bind() can't happen until element is created, and actually, you don't want to trigger the listener until the data has returned.
 
 */
 
@@ -139,7 +149,7 @@ class App {
   }
 
   getTagOptions() {
-    return this.contactsObj.reduce((tagOptions, contact) => {
+    return this.contactObjsArr.reduce((tagOptions, contact) => {
       contact.tags.forEach(tag => {
         if (!tagOptions.includes(tag)) tagOptions.push(tag);
       });
@@ -147,13 +157,14 @@ class App {
     }, []).sort();
   }
 
-  async createContactsObj() {
+  async createContactObjsArr() {
     let contactsArr = await this.fetchContacts();
     return contactsArr.map(contact => new Contact(contact));
   }
 
-  displayAllContacts() {
-    this.contactsObj.forEach(contact => {
+  displayContacts(contactsList) {
+    this.$contactListDiv.innerHTML = '';
+    contactsList.forEach(contact => {
       this.$contactListDiv.append(contact.$li);
     });
   }
@@ -194,16 +205,37 @@ class App {
   }
 
   async init() {
-    this.contactsObj = await this.createContactsObj();
+    this.contactObjsArr = await this.createContactObjsArr();
     this.tagOptions = this.getTagOptions();
 
     this.$buttonsDiv = document.getElementById("buttons");
     this.populateButtonsDivHTML();
     this.$contactListDiv = document.getElementById("contact-list");
     this.$userMessage = document.getElementById("user-message");
-    this.$errorMessage = document.getElementById("error-message");
 
-    this.displayAllContacts();
+    this.$errorMessage = document.getElementById("error-message");
+    
+    this.displayContacts(this.contactObjsArr);
+    
+    this.bind();
+  }
+
+  filterContacts(searchText) {
+    this.$userMessage.textContent = searchText;
+    return this.contactObjsArr.filter(contactObj => contactObj.name.toLowerCase().match(searchText));
+  }
+  
+  handleSearch(event) {
+    event.preventDefault();
+    
+    let searchText = this.$searchInput.value.trim().toLowerCase();
+    let filteredContacts = this.filterContacts(searchText);
+    this.displayContacts(filteredContacts);
+  }
+  
+  bind() {
+    
+    this.$searchInput.addEventListener('input', this.handleSearch.bind(this));
   }
 }
 
