@@ -160,7 +160,7 @@ class App {
   }
 
   getTagOptions() {
-    return this.contactObjsArr.reduce((tagOptions, contact) => {
+    return this.allContacts.reduce((tagOptions, contact) => {
       contact.tags.forEach(tag => {
         if (!tagOptions.includes(tag)) tagOptions.push(tag);
       });
@@ -168,7 +168,7 @@ class App {
     }, []).sort();
   }
 
-  async createContactObjsArr() {
+  async getAllContacts() {
     let contactsArr = await this.fetchContacts();
     return contactsArr.map(contact => new Contact(contact));
   }
@@ -216,7 +216,8 @@ class App {
   }
 
   async init() {
-    this.contactObjsArr = await this.createContactObjsArr();
+    this.allContacts = await this.getAllContacts();
+    this.filteredContacts = this.allContacts;
     this.tagOptions = this.getTagOptions();
 
     this.$buttonsDiv = document.getElementById("buttons");
@@ -226,18 +227,18 @@ class App {
 
     this.$errorMessage = document.getElementById("error-message");
     
-    this.displayContacts(this.contactObjsArr);
+    this.displayContacts(this.allContacts);
     
     this.bind();
   }
 
   filterContacts(searchObj) {
     if (Object.keys(searchObj).includes('searchName')) {
-      return this.contactObjsArr.filter(contactObj => contactObj.matchName(searchObj['searchName']));
+      return this.allContacts.filter(contactObj => contactObj.matchName(searchObj['searchName']));
     }
 
     if (Object.keys(searchObj).includes('tags')) {
-      return this.contactObjsArr.filter(contactObj => contactObj.matchTags(searchObj['tags']));
+      return this.allContacts.filter(contactObj => contactObj.matchTags(searchObj['tags']));
     }
   }
   
@@ -245,8 +246,8 @@ class App {
     event.preventDefault();
     
     let searchText = this.$searchInput.value.trim();
-    let filteredContacts = this.filterContacts({'searchName': searchText});
-    this.displayContacts(filteredContacts);
+    this.filteredContacts = this.filterContacts({'searchName': searchText});
+    this.displayContacts(this.filteredContacts);
   }
 
   handleTagSelect(event) {
@@ -258,11 +259,11 @@ class App {
     });
 
     if (selectedTags.length === 0) {
-      this.displayContacts(this.contactObjsArr);
+      this.filteredContacts = this.allContacts;
     } else {
-      let filteredContacts = this.filterContacts({'tags': selectedTags});
-      this.displayContacts(filteredContacts);
+      this.filteredContacts = this.filterContacts({'tags': selectedTags});
     }
+    this.displayContacts(this.filteredContacts);
   }
   
   bind() {
