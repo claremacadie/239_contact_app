@@ -41,14 +41,12 @@ Classes:
   - Form?
 
 To do:
-  - Filter contact list based on Search box
-    - event listener, input
-    - handler:
-      - filter contact list based on names
   - Filter contact list based on tags
     - event listener, checkbox selected, or unselected
       - filter contact list based on tags
   - Ensure both filters work together
+
+  - CSS to add space between Phone Number: etc.
 
   - Ensure new tags are lowercase
   - HTML class?
@@ -66,6 +64,10 @@ class Contact {
     this.tags = obj['tags'] === null ? [] : obj['tags'].split(',');
     this.init();
     this.populateHTML();
+  }
+
+  matchName(searchText) {
+    return this.name.toLowerCase().match(searchText);
   }
 
   addContactDetailsDivHTML() {
@@ -221,21 +223,21 @@ class App {
   }
 
   filterContacts(searchText) {
-    this.$userMessage.textContent = searchText;
-    return this.contactObjsArr.filter(contactObj => contactObj.name.toLowerCase().match(searchText));
+    return this.contactObjsArr.filter(contactObj => contactObj.matchName(searchText));
   }
   
   handleSearch(event) {
     event.preventDefault();
     
-    let searchText = this.$searchInput.value.trim().toLowerCase();
+    let searchText = this.$searchInput.value.trim();
     let filteredContacts = this.filterContacts(searchText);
     this.displayContacts(filteredContacts);
   }
   
   bind() {
-    
     this.$searchInput.addEventListener('input', this.handleSearch.bind(this));
+    // Add listener and handler for checkboxes
+    // Use this for debugging: this.$userMessage.textContent
   }
 }
 
