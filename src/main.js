@@ -41,9 +41,10 @@ Classes:
   - Form?
 
 To do:
-  - Filter contact list based on tags
-    - event listener, checkbox selected, or unselected
-      - filter contact list based on tags
+  - Filtering
+    - what if we want to select all contacts without tags? Add 'No tags' radio box
+    - what does the user expect? Should we have a 'No preference for tags' option as the default?
+    - at the moment, when I deselect all tags nothing is listed....
   - Ensure both filters work together
 
   - CSS to add space between Phone Number: etc.
@@ -68,6 +69,14 @@ class Contact {
 
   matchName(searchText) {
     return this.name.toLowerCase().match(searchText);
+  }
+
+  matchTags(tags) {
+    for (let i = 0; i < this.tags.length; i++) {
+      let tag = this.tags[i];
+      if (tags.includes(tag)) return true;
+    }
+    return false;
   }
 
   addContactDetailsDivHTML() {
@@ -222,21 +231,46 @@ class App {
     this.bind();
   }
 
-  filterContacts(searchText) {
-    return this.contactObjsArr.filter(contactObj => contactObj.matchName(searchText));
+  filterContacts(searchObj) {
+    if (Object.keys(searchObj).includes('searchName')) {
+      return this.contactObjsArr.filter(contactObj => contactObj.matchName(searchObj['searchName']));
+    }
+
+    if (Object.keys(searchObj).includes('tags')) {
+      return this.contactObjsArr.filter(contactObj => contactObj.matchTags(searchObj['tags']));
+    }
   }
   
   handleSearch(event) {
     event.preventDefault();
     
     let searchText = this.$searchInput.value.trim();
-    let filteredContacts = this.filterContacts(searchText);
+    let filteredContacts = this.filterContacts({'searchName': searchText});
     this.displayContacts(filteredContacts);
+  }
+
+  handleTagSelect(event) {
+    event.preventDefault();
+
+    let selectedTags = [];
+    [...this.$tagsFieldset.querySelectorAll('input')].forEach(checkbox => {
+      if (checkbox.checked) selectedTags.push(checkbox.value);
+    });
+
+    if (selectedTags.length === 0) {
+      this.displayContacts(this.contactObjsArr);
+    } else {
+      let filteredContacts = this.filterContacts({'tags': selectedTags});
+      this.displayContacts(filteredContacts);
+    }
   }
   
   bind() {
     this.$searchInput.addEventListener('input', this.handleSearch.bind(this));
-    // Add listener and handler for checkboxes
+    this.$tagsFieldset.addEventListener('change', this.handleTagSelect.bind(this));
+
+    // Handle case when both searchName and tags are selected
+
     // Use this for debugging: this.$userMessage.textContent
   }
 }

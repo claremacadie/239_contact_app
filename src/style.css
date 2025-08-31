@@ -29,6 +29,7 @@ dt, dd {
 button,
 input.search {
   margin-right: 1em;
+  margin-bottom: 1em;
   padding: 0.5em;
   border-radius: 0.5em;
 }
