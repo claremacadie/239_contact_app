@@ -1,57 +1,37 @@
 /*
-Home page view:
-  Add Contact button:
-    Form: name, phone number, email, tag (checkboxes and free text for new tag)
-
-  Search input box:
-    - Search name only
-    - Dynamically specify results in list
-      - name, phone, email, edit, delete
+Contact list:
+    - edit: navigate to form
     - delete: alert are you sure you want to delete the contact? Ok, Cancel
     - use debounce to prevent overwhelm
 
-  Tag box:
-    - radio buttons so can select multiple
-
-  List:
-    - all contacts initially
-    - dynamically change with search
-    - change when selected tags
-
 Alternative view:
   Create Contact Form:
-    - Form: Full name, Email address, Telephone number, Tags (multiple, radio) submit, cancel
+    - Form: Full name, Email address, Telephone number, Tags (checkboxes and add new) submit, cancel
     - ensure valid inputs
     - ensure unique name, email and telephone
 
   Edit Contact Form:
     - as above, but with fields filled in
 
-Decisions:
-  - HTML in file and hide?
-  - Dynamically create HTML - do this because it is harder?
-  - Error handling:
-    - try/catch for fetch
-    - messages to user
-
 Classes:
   - App
   - Contact
   - HTMLTemplate?
   - Form?
+  - Search/Display contacts
+  - Fetching data, inc error handling
 
 To do:
-  - Filtering
-    - what if we want to select all contacts without tags? Add 'No tags' radio box
-    - what does the user expect? Should we have a 'No preference for tags' option as the default?
-    - at the moment, when I deselect all tags nothing is listed....
-  - Ensure both filters work together
-
-  - CSS to add space between Phone Number: etc.
-
-  - Ensure new tags are lowercase
-  - HTML class?
+  - Create add Contact functionality
+    - event listener for button
+    - event handler to display form
+    - fetch(send) data, error handling
+    - Ensure new tags are lowercase
+ 
   - When should data be fetched? What if other people are adding contacts?
+  - Error handling:
+    - try/catch for all fetch
+    - messages to user
   - App class: bind is inside init because init has an await call and bind() can't happen until element is created, and actually, you don't want to trigger the listener until the data has returned.
 
 */
@@ -173,9 +153,9 @@ class App {
     return contactsArr.map(contact => new Contact(contact));
   }
 
-  displayContacts(contactsList) {
+  displayContacts() {
     this.$contactListDiv.innerHTML = '';
-    contactsList.forEach(contact => {
+    this.filteredContacts.forEach(contact => {
       this.$contactListDiv.append(contact.$li);
     });
   }
@@ -219,6 +199,7 @@ class App {
     this.allContacts = await this.getAllContacts();
     this.filteredContacts = this.allContacts;
     this.tagOptions = this.getTagOptions();
+    this.searchCriteria = {'name': '', 'tags': []};
 
     this.$buttonsDiv = document.getElementById("buttons");
     this.populateButtonsDivHTML();
@@ -232,13 +213,17 @@ class App {
     this.bind();
   }
 
-  filterContacts(searchObj) {
-    if (Object.keys(searchObj).includes('searchName')) {
-      return this.allContacts.filter(contactObj => contactObj.matchName(searchObj['searchName']));
+  filterContacts() {
+    if (this.searchCriteria['name'] === '') {
+      this.filteredContacts = this.allContacts;
+    } else {
+      this.filteredContacts = this.allContacts.filter(contactObj => contactObj.matchName(this.searchCriteria['name']));
     }
 
-    if (Object.keys(searchObj).includes('tags')) {
-      return this.allContacts.filter(contactObj => contactObj.matchTags(searchObj['tags']));
+    if (this.searchCriteria['tags'].length === 0) {
+      return;
+    } else {
+      this.filteredContacts = this.filteredContacts.filter(contactObj => contactObj.matchTags(this.searchCriteria['tags']));
     }
   }
   
@@ -246,8 +231,9 @@ class App {
     event.preventDefault();
     
     let searchText = this.$searchInput.value.trim();
-    this.filteredContacts = this.filterContacts({'searchName': searchText});
-    this.displayContacts(this.filteredContacts);
+    this.searchCriteria['name'] = searchText;
+    this.filterContacts();
+    this.displayContacts();
   }
 
   handleTagSelect(event) {
@@ -258,22 +244,14 @@ class App {
       if (checkbox.checked) selectedTags.push(checkbox.value);
     });
 
-    this.filteredContacts = this.filterContacts({'tags': selectedTags});
-    this.displayContacts(this.filteredContacts);
+    this.searchCriteria['tags'] = selectedTags;
+    this.filterContacts();
+    this.displayContacts();
   }
   
   bind() {
     this.$searchInput.addEventListener('input', this.handleSearch.bind(this));
     this.$tagsFieldset.addEventListener('change', this.handleTagSelect.bind(this));
-    // To do:
-      // Refactor initial state to use this.searchCriteria = {name: '', tags: []}
-      // Update event listeners to:
-        // change state, 
-        // refilter:
-          // if name blank, set filtered to all, then filter by tags (if no tags, no nothing)
-          // otherwise, set filtered to those that match name, then filter by tags (if no tags, no nothing)
-        // redisplay filtered
-
     // Use this for debugging: this.$userMessage.textContent
   }
 }
