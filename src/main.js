@@ -258,19 +258,21 @@ class App {
       if (checkbox.checked) selectedTags.push(checkbox.value);
     });
 
-    if (selectedTags.length === 0) {
-      this.filteredContacts = this.allContacts;
-    } else {
-      this.filteredContacts = this.filterContacts({'tags': selectedTags});
-    }
+    this.filteredContacts = this.filterContacts({'tags': selectedTags});
     this.displayContacts(this.filteredContacts);
   }
   
   bind() {
     this.$searchInput.addEventListener('input', this.handleSearch.bind(this));
     this.$tagsFieldset.addEventListener('change', this.handleTagSelect.bind(this));
-
-    // Handle case when both searchName and tags are selected
+    // To do:
+      // Refactor initial state to use this.searchCriteria = {name: '', tags: []}
+      // Update event listeners to:
+        // change state, 
+        // refilter:
+          // if name blank, set filtered to all, then filter by tags (if no tags, no nothing)
+          // otherwise, set filtered to those that match name, then filter by tags (if no tags, no nothing)
+        // redisplay filtered
 
     // Use this for debugging: this.$userMessage.textContent
   }
