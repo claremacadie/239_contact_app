@@ -30,7 +30,7 @@ To do:
  
 
   - Feels inefficient to be creating and deleting HTML for the form and contact list/buttons
-  
+
   - When should data be fetched? What if other people are adding contacts?
   - Error handling:
     - try/catch for all fetch
@@ -184,6 +184,10 @@ class App {
   }
 
   populateButtonsDivHTML() {
+    this.$contactButtonsDiv.append(this.$addContactButton, this.$searchInput, this.$tagsFieldset);
+  }
+
+  createButtonsDivHTML() {
     this.$addContactButton = document.createElement('button');
     this.$addContactButton.textContent = "Add Contact";
 
@@ -195,7 +199,7 @@ class App {
     this.$tagsFieldset = document.createElement('fieldset');
     this.populateTagsFieldsetHTML();
 
-    this.$contactButtonsDiv.append(this.$addContactButton, this.$searchInput, this.$tagsFieldset);
+    this.populateButtonsDivHTML();
   }
 
   async init() {
@@ -210,7 +214,7 @@ class App {
     this.$userMessage = document.getElementById("user-message");
     this.$errorMessage = document.getElementById("error-message");
 
-    this.populateButtonsDivHTML();
+    this.createButtonsDivHTML();
     this.displayContacts(this.allContacts);
 
     this.bind();
