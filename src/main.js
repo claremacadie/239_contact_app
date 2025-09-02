@@ -192,7 +192,7 @@ class App {
     this.$tagsFieldset = document.createElement('fieldset');
     this.populateTagsFieldsetHTML();
 
-    this.$buttonsDiv.append(this.$addContactButton, this.$searchInput, this.$tagsFieldset);
+    this.$contactListDiv.append(this.$addContactButton, this.$searchInput, this.$tagsFieldset);
   }
 
   async init() {
@@ -201,15 +201,13 @@ class App {
     this.tagOptions = this.getTagOptions();
     this.searchCriteria = {'name': '', 'tags': []};
 
-    this.$buttonsDiv = document.getElementById("buttons");
-    this.populateButtonsDivHTML();
     this.$contactListDiv = document.getElementById("contact-list");
     this.$userMessage = document.getElementById("user-message");
-
     this.$errorMessage = document.getElementById("error-message");
-    
+
+    this.populateButtonsDivHTML();
     this.displayContacts(this.allContacts);
-    
+
     this.bind();
   }
 
@@ -248,10 +246,16 @@ class App {
     this.filterContacts();
     this.displayContacts();
   }
+
+  handleAddContact(event) {
+    event.preventDefault();
+    this.createAddContactForm();
+  }
   
   bind() {
     this.$searchInput.addEventListener('input', this.handleSearch.bind(this));
     this.$tagsFieldset.addEventListener('change', this.handleTagSelect.bind(this));
+    this.$addContactButton.addEventListener('click', this.handleAddContact.bind(this));
     // Use this for debugging: this.$userMessage.textContent
   }
 }
