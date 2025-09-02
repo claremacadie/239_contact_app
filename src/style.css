@@ -2,10 +2,15 @@ div {
   margin: 1em;
 }
 
-div#buttons {
+div#contacts-buttons {
   background-color: rgb(165, 221, 221);
   padding: 1em;
   width: 30%;
+}
+
+#contacts-buttons:empty {
+  background: transparent;
+  padding: 0;
 }
 
 h1 {

@@ -28,6 +28,9 @@ To do:
     - fetch(send) data, error handling
     - Ensure new tags are lowercase
  
+
+  - Feels inefficient to be creating and deleting HTML for the form and contact list/buttons
+  
   - When should data be fetched? What if other people are adding contacts?
   - Error handling:
     - try/catch for all fetch
@@ -192,7 +195,7 @@ class App {
     this.$tagsFieldset = document.createElement('fieldset');
     this.populateTagsFieldsetHTML();
 
-    this.$contactListDiv.append(this.$addContactButton, this.$searchInput, this.$tagsFieldset);
+    this.$contactButtonsDiv.append(this.$addContactButton, this.$searchInput, this.$tagsFieldset);
   }
 
   async init() {
@@ -201,7 +204,9 @@ class App {
     this.tagOptions = this.getTagOptions();
     this.searchCriteria = {'name': '', 'tags': []};
 
-    this.$contactListDiv = document.getElementById("contact-list");
+    this.$contactButtonsDiv = document.getElementById("contacts-buttons");
+    this.$contactListDiv = document.getElementById("contacts-list");
+    this.$contactFormDiv = document.getElementById('contact-form')
     this.$userMessage = document.getElementById("user-message");
     this.$errorMessage = document.getElementById("error-message");
 
@@ -223,6 +228,10 @@ class App {
     } else {
       this.filteredContacts = this.filteredContacts.filter(contactObj => contactObj.matchTags(this.searchCriteria['tags']));
     }
+  }
+
+  createAddContactForm() {
+    this.$contactFormDiv.textContent = 'Add contact';
   }
   
   handleSearch(event) {
@@ -249,6 +258,8 @@ class App {
 
   handleAddContact(event) {
     event.preventDefault();
+    this.$contactButtonsDiv.innerHTML = '';
+    this.$contactListDiv.innerHTML = '';
     this.createAddContactForm();
   }
   
