@@ -1,17 +1,16 @@
 /*
 Contact list:
-    - edit: navigate to form
-    - delete: alert are you sure you want to delete the contact? Ok, Cancel
-    - use debounce to prevent overwhelm
+  - edit: navigate to form
+  - delete: alert are you sure you want to delete the contact? Ok, Cancel
+  - use debounce to prevent overwhelm
 
 Alternative view:
   Create Contact Form:
-    - Form: Full name, Email address, Telephone number, Tags (checkboxes and add new) submit, cancel
     - ensure valid inputs
     - ensure unique name, email and telephone
 
-  Edit Contact Form:
-    - as above, but with fields filled in
+Edit Contact Form:
+  - as above, but with fields filled in
 
 Classes:
   - App
@@ -23,21 +22,20 @@ Classes:
 
 To do:
   - Create add Contact functionality
-    - fetch(send) data, error handling
     - Ensure new tags are lowercase
+    - fetch(send) data, error handling
 
   - Beware using the same form for editing a contact because the `method` attribute is PUT, not POST
- 
-  - Create class for contact interface
 
   - When should data be fetched? What if other people are adding contacts?
+    - Use setInterval to call every minute?
   - When should tagOptions be fetched? Especially for add contact form.
+    - Every time data is fetched?
 
   - Error handling:
     - try/catch for all fetch
     - messages to user
-  - App class: bind is inside init because init has an await call and bind() can't happen until element is created, and actually, you don't want to trigger the listener until the data has returned.
-
+      - when app does something, even involving another class, if an error message comes back, display it and tell user to refresh page?
 */
 
 class Contact {
