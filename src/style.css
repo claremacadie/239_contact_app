@@ -1,41 +1,26 @@
-div {
-  margin: 1em;
-}
+/* layout */
+#contacts-interface > div { margin: 1em; }
 
-div#contacts-buttons {
-  background-color: rgb(165, 221, 221);
+#contacts-controls {
+  background: rgb(165, 221, 221);
   padding: 1em;
   width: 30%;
 }
 
-#contacts-buttons:empty {
+#contacts-controls:empty {
   background: transparent;
   padding: 0;
 }
 
-h1 {
-  font-size: 16pt;
-  margin: 1em;
-}
+/* text */
+h1 { font-size: 16pt; margin: 1em; }
 
-h3 {
-  margin: 1em;
-}
+li { list-style: none; padding-bottom: 1em; }
 
-li {
-  list-style: none;
-  padding-bottom: 2em;
-}
+dt, dd { display: inline; padding-right: .5em; }
+dd { font-family: monospace; }
 
-dt, dd {
-  display: inline;
-  padding-right: 0.5em;
-}
-
-dd {
-  font-family: monospace;
-}
-
+/* controls */
 button,
 input.search {
   margin-right: 1em;
@@ -44,25 +29,15 @@ input.search {
   border-radius: 0.5em;
 }
 
-fieldset.tags {
-  padding-top: 1em;
-}
+/* form */
+#contact-form label { display: block; margin: 0.5em; }
+#contact-form input { margin: 0.5em; }
 
-fieldset.tags > legend {
-  float: left;
-  margin-right: .75rem;
-}
-
+fieldset.tags { padding-top: 0; }
+fieldset.tags > legend { display: block; margin-bottom: 0.25rem; }
 fieldset.tags > label {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: .25rem;
-  margin-right: .75rem;
+  gap: 0.25rem;
+  margin: 0.15rem 0 0.15rem 1rem; /* left indent */
 }
-
-fieldset.tags::after {
-  content: "";
-  display: table;
-  clear: both;
-}
-

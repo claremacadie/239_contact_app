@@ -23,15 +23,16 @@ Classes:
 
 To do:
   - Create add Contact functionality
-    - event listener for button
-    - event handler to display form
     - fetch(send) data, error handling
     - Ensure new tags are lowercase
- 
 
-  - Feels inefficient to be creating and deleting HTML for the form and contact list/buttons
+  - Beware using the same form for editing a contact because the `method` attribute is PUT, not POST
+ 
+  - Create class for contact interface
 
   - When should data be fetched? What if other people are adding contacts?
+  - When should tagOptions be fetched? Especially for add contact form.
+
   - Error handling:
     - try/catch for all fetch
     - messages to user
@@ -124,6 +125,77 @@ class Contact {
   }
 }
 
+class ContactForm {
+  constructor(url, tagOptions) {
+    this.url = url;
+    this.tagOptions = tagOptions;
+    this.init();
+  }
+
+createFormHTML() {
+  let nameLabel = document.createElement('label');
+  nameLabel.textContent = "Full name:";
+  let nameInput = document.createElement('input');
+  nameInput.setAttribute('type', 'text');
+  nameLabel.append(nameInput);
+
+  let emailLabel = document.createElement('label');
+  emailLabel.textContent = "Email address:";
+  let emailInput = document.createElement('input');
+  emailInput.setAttribute('type', 'email');
+  emailLabel.append(emailInput);
+
+  let phoneLabel = document.createElement('label');
+  phoneLabel.textContent = "Telephone number:";
+  let phoneInput = document.createElement('input');
+  phoneInput.setAttribute('type', 'text');
+  phoneLabel.append(phoneInput);
+
+  let tagsFieldset = document.createElement('fieldset');
+  tagsFieldset.className = 'tags';
+    
+  let legend = document.createElement('legend');
+  legend.textContent = 'Select tags:';
+  tagsFieldset.append(legend);
+
+  this.tagOptions.forEach(tagOption => {
+    let label = document.createElement('label');
+    let labelText = document.createTextNode(tagOption);
+    let input = document.createElement('input');
+    input.setAttribute('type', 'checkbox');
+    input.setAttribute('name', 'tags');
+    input.setAttribute('value', tagOption);
+    label.append(input, labelText);
+
+    tagsFieldset.append(label);
+  });
+
+  let tagsLabel = document.createElement('label');
+  tagsLabel.textContent = "Add new tags, comma-separated";
+  let tagsInput = document.createElement('input');
+  tagsInput.setAttribute('type', 'text');
+  tagsLabel.append(tagsInput);
+
+  let submitButton = document.createElement('button');
+  submitButton.textContent = 'Submit';
+  submitButton.setAttribute('type', 'submit');
+
+  this.$cancelButton.textContent = 'Cancel';
+  submitButton.setAttribute('type', 'button');
+
+  this.$form.setAttribute('action', this.url);
+  this.$form.setAttribute('method', 'POST');
+  this.$form.append(nameLabel, emailLabel, phoneLabel, tagsFieldset, tagsLabel, submitButton, this.$cancelButton);
+}
+
+  init() {
+    this.$form = document.createElement('form');
+    this.$cancelButton = document.createElement('button');
+    this.createFormHTML();
+    // bind listeners for form and cancel button
+  }
+}
+
 class App {
   constructor(url) {
     this.url = url;
@@ -163,7 +235,7 @@ class App {
     });
   }
 
-  populateTagsFieldsetHTML() {
+  populateTagsFieldset() {
     this.$tagsFieldset.className = 'tags';
     
     let legend = document.createElement('legend');
@@ -183,23 +255,30 @@ class App {
     });
   }
 
-  populateButtonsDivHTML() {
-    this.$contactButtonsDiv.append(this.$addContactButton, this.$searchInput, this.$tagsFieldset);
+  populateControlsDiv() {
+    this.$contactControlsDiv.append( this.$searchInput, this.$tagsFieldset);
+  }
+
+  populateButtonsDiv() {
+    this.$contactButtonsDiv.append(this.$addContactButton);
   }
 
   createButtonsDivHTML() {
     this.$addContactButton = document.createElement('button');
     this.$addContactButton.textContent = "Add Contact";
+    this.populateButtonsDiv();
+  }
 
+  createControlsDivHTML() {
     this.$searchInput = document.createElement('input');
     this.$searchInput.className = 'search';
     this.$searchInput.setAttribute('type', 'text');
     this.$searchInput.setAttribute('placeholder', 'Search');
 
     this.$tagsFieldset = document.createElement('fieldset');
-    this.populateTagsFieldsetHTML();
+    this.populateTagsFieldset();
 
-    this.populateButtonsDivHTML();
+    this.populateControlsDiv();
   }
 
   async init() {
@@ -207,7 +286,9 @@ class App {
     this.filteredContacts = this.allContacts;
     this.tagOptions = this.getTagOptions();
     this.searchCriteria = {'name': '', 'tags': []};
+    this.contactForm = new ContactForm(this.url, this.tagOptions);
 
+    this.$contactControlsDiv = document.getElementById("contacts-controls");
     this.$contactButtonsDiv = document.getElementById("contacts-buttons");
     this.$contactListDiv = document.getElementById("contacts-list");
     this.$contactFormDiv = document.getElementById('contact-form')
@@ -215,6 +296,7 @@ class App {
     this.$errorMessage = document.getElementById("error-message");
 
     this.createButtonsDivHTML();
+    this.createControlsDivHTML();
     this.displayContacts(this.allContacts);
 
     this.bind();
@@ -234,8 +316,8 @@ class App {
     }
   }
 
-  createAddContactForm() {
-    this.$contactFormDiv.textContent = 'Add contact';
+  populateContactForm() {
+    this.$contactFormDiv.append(this.contactForm.$form);
   }
   
   handleSearch(event) {
@@ -263,8 +345,9 @@ class App {
   handleAddContact(event) {
     event.preventDefault();
     this.$contactButtonsDiv.innerHTML = '';
+    this.$contactControlsDiv.innerHTML = '';
     this.$contactListDiv.innerHTML = '';
-    this.createAddContactForm();
+    this.populateContactForm();
   }
   
   bind() {
