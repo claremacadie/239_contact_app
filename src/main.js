@@ -222,43 +222,29 @@ class ContactForm {
   }
 }
 
-class App {
-  constructor(url) {
-    this.url = url;
+class ContactsList {
+  constructor(allContacts, tagOptions) {
+    this.allContacts = allContacts;
+    this.tagOptions = tagOptions;
     this.init();
   }
 
-  async fetchContacts() {
-    let path = "/contacts";
-    try {
-      let response = await fetch(this.url + path);
-      if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-      let contacts = await response.json();
-      return contacts;
-    } catch(error) {
-      console.log(error)
-    }
+  async init() {
+    this.filteredContacts = this.allContacts;
+    this.searchCriteria = {'name': '', 'tags': []};
+
+    this.$contactControlsDiv = document.getElementById("contacts-controls");
+    this.$contactListDiv = document.getElementById("contacts-list");
+
+    this.createControlsDivHTML();
+    this.displayContacts();
+
+    this.bind();
   }
 
-  getTagOptions() {
-    return this.allContacts.reduce((tagOptions, contact) => {
-      contact.tags.forEach(tag => {
-        if (!tagOptions.includes(tag)) tagOptions.push(tag);
-      });
-      return tagOptions;
-    }, []).sort();
-  }
-
-  async getAllContacts() {
-    let contactsArr = await this.fetchContacts();
-    return contactsArr.map(contact => new Contact(contact));
-  }
-
-  displayContacts() {
-    this.$contactListDiv.innerHTML = '';
-    this.filteredContacts.forEach(contact => {
-      this.$contactListDiv.append(contact.$li);
-    });
+  bind() {
+    this.$searchInput.addEventListener('input', this.handleSearch.bind(this));
+    this.$tagsFieldset.addEventListener('change', this.handleTagSelect.bind(this));
   }
 
   populateTagsFieldset() {
@@ -285,16 +271,6 @@ class App {
     this.$contactControlsDiv.append( this.$searchInput, this.$tagsFieldset);
   }
 
-  populateButtonsDiv() {
-    this.$contactButtonsDiv.append(this.$addContactButton);
-  }
-
-  createButtonsDivHTML() {
-    this.$addContactButton = document.createElement('button');
-    this.$addContactButton.textContent = "Add Contact";
-    this.populateButtonsDiv();
-  }
-
   createControlsDivHTML() {
     this.$searchInput = document.createElement('input');
     this.$searchInput.className = 'search';
@@ -307,25 +283,11 @@ class App {
     this.populateControlsDiv();
   }
 
-  async init() {
-    this.allContacts = await this.getAllContacts();
-    this.filteredContacts = this.allContacts;
-    this.tagOptions = this.getTagOptions();
-    this.searchCriteria = {'name': '', 'tags': []};
-    this.contactForm = new ContactForm(this.url, this.tagOptions);
-
-    this.$contactControlsDiv = document.getElementById("contacts-controls");
-    this.$contactButtonsDiv = document.getElementById("contacts-buttons");
-    this.$contactListDiv = document.getElementById("contacts-list");
-    this.$contactFormDiv = document.getElementById('contact-form')
-    this.$userMessage = document.getElementById("user-message");
-    this.$errorMessage = document.getElementById("error-message");
-
-    this.createButtonsDivHTML();
-    this.createControlsDivHTML();
-    this.displayContacts(this.allContacts);
-
-    this.bind();
+  displayContacts() {
+    this.$contactListDiv.innerHTML = '';
+    this.filteredContacts.forEach(contact => {
+      this.$contactListDiv.append(contact.$li);
+    });
   }
 
   filterContacts() {
@@ -342,10 +304,6 @@ class App {
     }
   }
 
-  populateContactForm() {
-    this.$contactFormDiv.append(this.contactForm.$form);
-  }
-  
   handleSearch(event) {
     event.preventDefault();
     
@@ -367,20 +325,82 @@ class App {
     this.filterContacts();
     this.displayContacts();
   }
+}
+
+class App {
+  constructor(url) {
+    this.url = url;
+    this.init();
+  }
+
+  async init() {
+    this.allContacts = await this.getAllContacts();
+    this.tagOptions = this.getTagOptions();
+
+    this.contactsList = new ContactsList(this.allContacts, this.tagOptions);
+    this.contactForm = new ContactForm(this.url, this.tagOptions);
+
+    this.$contactButtonsDiv = document.getElementById("contacts-buttons");
+    this.$contactFormDiv = document.getElementById('contact-form')
+    this.$userMessage = document.getElementById("user-message");
+    this.$errorMessage = document.getElementById("error-message");
+
+    this.createButtonsDivHTML();
+
+    this.bind();
+  }
+  
+  bind() {
+    this.$addContactButton.addEventListener('click', this.handleAddContact.bind(this));
+    // Use this for debugging: this.$userMessage.textContent
+  }
+
+  async fetchContacts() {
+    let path = "/contacts";
+    try {
+      let response = await fetch(this.url + path);
+      if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+      let contacts = await response.json();
+      return contacts;
+    } catch(error) {
+      console.log(error)
+    }
+  }
+
+  async getAllContacts() {
+    let contactsArr = await this.fetchContacts();
+    return contactsArr.map(contact => new Contact(contact));
+  }
+
+  getTagOptions() {
+    return this.allContacts.reduce((tagOptions, contact) => {
+      contact.tags.forEach(tag => {
+        if (!tagOptions.includes(tag)) tagOptions.push(tag);
+      });
+      return tagOptions;
+    }, []).sort();
+  }
+
+  createButtonsDivHTML() {
+    this.$addContactButton = document.createElement('button');
+    this.$addContactButton.textContent = "Add Contact";
+    this.populateButtonsDiv();
+  }
 
   handleAddContact(event) {
     event.preventDefault();
     this.$contactButtonsDiv.innerHTML = '';
-    this.$contactControlsDiv.innerHTML = '';
-    this.$contactListDiv.innerHTML = '';
+    this.contactsList.$contactControlsDiv.innerHTML = '';
+    this.contactsList.$contactListDiv.innerHTML = '';
     this.populateContactForm();
   }
-  
-  bind() {
-    this.$searchInput.addEventListener('input', this.handleSearch.bind(this));
-    this.$tagsFieldset.addEventListener('change', this.handleTagSelect.bind(this));
-    this.$addContactButton.addEventListener('click', this.handleAddContact.bind(this));
-    // Use this for debugging: this.$userMessage.textContent
+
+  populateButtonsDiv() {
+    this.$contactButtonsDiv.append(this.$addContactButton);
+  }
+
+  populateContactForm() {
+    this.$contactFormDiv.append(this.contactForm.$form);
   }
 }
 
