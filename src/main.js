@@ -132,61 +132,87 @@ class ContactForm {
     this.init();
   }
 
-createFormHTML() {
-  let nameLabel = document.createElement('label');
-  nameLabel.textContent = "Full name:";
-  let nameInput = document.createElement('input');
-  nameInput.setAttribute('type', 'text');
-  nameLabel.append(nameInput);
+  createNameLabelHTML() {
+    let nameLabel = document.createElement('label');
+    nameLabel.textContent = "Full name:";
+    let nameInput = document.createElement('input');
+    nameInput.setAttribute('type', 'text');
+    nameLabel.append(nameInput);
+    return nameLabel;
+  }
 
-  let emailLabel = document.createElement('label');
-  emailLabel.textContent = "Email address:";
-  let emailInput = document.createElement('input');
-  emailInput.setAttribute('type', 'email');
-  emailLabel.append(emailInput);
+  createEmailLabelHTML() {
+    let emailLabel = document.createElement('label');
+    emailLabel.textContent = "Email address:";
+    let emailInput = document.createElement('input');
+    emailInput.setAttribute('type', 'email');
+    emailLabel.append(emailInput);
+    return emailLabel;
+  }
 
-  let phoneLabel = document.createElement('label');
-  phoneLabel.textContent = "Telephone number:";
-  let phoneInput = document.createElement('input');
-  phoneInput.setAttribute('type', 'text');
-  phoneLabel.append(phoneInput);
+  createPhoneLabelHTML() {
+    let phoneLabel = document.createElement('label');
+    phoneLabel.textContent = "Telephone number:";
+    let phoneInput = document.createElement('input');
+    phoneInput.setAttribute('type', 'text');
+    phoneLabel.append(phoneInput);
+    return phoneLabel;
+  }
 
-  let tagsFieldset = document.createElement('fieldset');
-  tagsFieldset.className = 'tags';
-    
-  let legend = document.createElement('legend');
-  legend.textContent = 'Select tags:';
-  tagsFieldset.append(legend);
+  createTagsFieldsetHTML() {
+    let tagsFieldset = document.createElement('fieldset');
+    tagsFieldset.className = 'tags';
+      
+    let legend = document.createElement('legend');
+    legend.textContent = 'Select tags:';
+    tagsFieldset.append(legend);
 
-  this.tagOptions.forEach(tagOption => {
-    let label = document.createElement('label');
-    let labelText = document.createTextNode(tagOption);
-    let input = document.createElement('input');
-    input.setAttribute('type', 'checkbox');
-    input.setAttribute('name', 'tags');
-    input.setAttribute('value', tagOption);
-    label.append(input, labelText);
+    this.tagOptions.forEach(tagOption => {
+      let label = document.createElement('label');
+      let labelText = document.createTextNode(tagOption);
+      let input = document.createElement('input');
+      input.setAttribute('type', 'checkbox');
+      input.setAttribute('name', 'tags');
+      input.setAttribute('value', tagOption);
+      label.append(input, labelText);
 
-    tagsFieldset.append(label);
-  });
+      tagsFieldset.append(label);
+    });
 
-  let tagsLabel = document.createElement('label');
-  tagsLabel.textContent = "Add new tags, comma-separated";
-  let tagsInput = document.createElement('input');
-  tagsInput.setAttribute('type', 'text');
-  tagsLabel.append(tagsInput);
+    return tagsFieldset;
+  }
 
-  let submitButton = document.createElement('button');
-  submitButton.textContent = 'Submit';
-  submitButton.setAttribute('type', 'submit');
+  createTagsLabelHTML() {
+    let tagsLabel = document.createElement('label');
+    tagsLabel.textContent = "Add new tags, comma-separated";
+    let tagsInput = document.createElement('input');
+    tagsInput.setAttribute('type', 'text');
+    tagsLabel.append(tagsInput);
+    return tagsLabel;
+  }
 
-  this.$cancelButton.textContent = 'Cancel';
-  submitButton.setAttribute('type', 'button');
+  createSubmitButtonHTML() {
+    let submitButton = document.createElement('button');
+    submitButton.textContent = 'Submit';
+    submitButton.setAttribute('type', 'submit');
+    return submitButton;
+  }
 
-  this.$form.setAttribute('action', this.url);
-  this.$form.setAttribute('method', 'POST');
-  this.$form.append(nameLabel, emailLabel, phoneLabel, tagsFieldset, tagsLabel, submitButton, this.$cancelButton);
-}
+  createFormHTML() {
+    let nameLabel = this.createNameLabelHTML();
+    let emailLabel = this.createEmailLabelHTML();
+    let phoneLabel = this.createPhoneLabelHTML();
+    let tagsFieldset = this.createTagsFieldsetHTML();
+    let tagsLabel = this.createTagsLabelHTML();
+    let submitButton = this.createSubmitButtonHTML();
+
+    this.$cancelButton.textContent = 'Cancel';
+    submitButton.setAttribute('type', 'button');
+
+    this.$form.setAttribute('action', this.url);
+    this.$form.setAttribute('method', 'POST');
+    this.$form.append(nameLabel, emailLabel, phoneLabel, tagsFieldset, tagsLabel, submitButton, this.$cancelButton);
+  }
 
   init() {
     this.$form = document.createElement('form');
