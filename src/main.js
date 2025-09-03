@@ -36,6 +36,7 @@ To do:
     - try/catch for all fetch
     - messages to user
       - when app does something, even involving another class, if an error message comes back, display it and tell user to refresh page?
+      - messages about loading data?
 */
 
 class Contact {
@@ -124,9 +125,9 @@ class Contact {
 }
 
 class ContactForm {
-  constructor(url, tagOptions) {
+  constructor(url, app) {
     this.url = url;
-    this.tagOptions = tagOptions;
+    this.app = app;
     this.init();
   }
 
@@ -165,7 +166,7 @@ class ContactForm {
     legend.textContent = 'Select tags:';
     tagsFieldset.append(legend);
 
-    this.tagOptions.forEach(tagOption => {
+    this.app.tagOptions.forEach(tagOption => {
       let label = document.createElement('label');
       let labelText = document.createTextNode(tagOption);
       let input = document.createElement('input');
@@ -205,18 +206,33 @@ class ContactForm {
     let submitButton = this.createSubmitButtonHTML();
 
     this.$cancelButton.textContent = 'Cancel';
-    submitButton.setAttribute('type', 'button');
+    this.$cancelButton.setAttribute('type', 'button');
 
     this.$form.setAttribute('action', this.url);
     this.$form.setAttribute('method', 'POST');
     this.$form.append(nameLabel, emailLabel, phoneLabel, tagsFieldset, tagsLabel, submitButton, this.$cancelButton);
   }
 
+  handleFormSubmit(event) {
+    event.preventDefault();
+    this.app.$userMessage.textContent = 'Handle Form Submit';
+  }
+  
+  handleCancelButton(event) {
+    event.preventDefault();
+    this.app.resetContactListDisplay();
+  }
+  
   init() {
     this.$form = document.createElement('form');
     this.$cancelButton = document.createElement('button');
     this.createFormHTML();
-    // bind listeners for form and cancel button
+    this.bind();
+  }
+  
+  bind() {
+    this.$form.addEventListener('submit', this.handleFormSubmit.bind(this));
+    this.$cancelButton.addEventListener('click', this.handleCancelButton.bind(this));
   }
 }
 
@@ -235,6 +251,8 @@ class ContactsList {
     this.$contactListDiv = document.getElementById("contacts-list");
 
     this.createControlsDivHTML();
+
+    this.populateControlsDiv();
     this.displayContacts();
 
     this.bind();
@@ -277,8 +295,6 @@ class ContactsList {
 
     this.$tagsFieldset = document.createElement('fieldset');
     this.populateTagsFieldset();
-
-    this.populateControlsDiv();
   }
 
   displayContacts() {
@@ -300,6 +316,13 @@ class ContactsList {
     } else {
       this.filteredContacts = this.filteredContacts.filter(contactObj => contactObj.matchTags(this.searchCriteria['tags']));
     }
+  }
+
+  displayContactsAndInterface() {
+    this.filteredContacts = this.allContacts;
+    this.searchCriteria = {'name': '', 'tags': []};
+    this.populateControlsDiv();
+    this.displayContacts();
   }
 
   handleSearch(event) {
@@ -336,7 +359,7 @@ class App {
     this.tagOptions = this.getTagOptions();
 
     this.contactsList = new ContactsList(this.allContacts, this.tagOptions);
-    this.contactForm = new ContactForm(this.url, this.tagOptions);
+    this.contactForm = new ContactForm(this.url, this);
 
     this.$contactButtonsDiv = document.getElementById("contacts-buttons");
     this.$contactFormDiv = document.getElementById('contact-form')
@@ -399,6 +422,11 @@ class App {
 
   populateContactForm() {
     this.$contactFormDiv.append(this.contactForm.$form);
+  }
+
+  resetContactListDisplay() {
+    this.$contactFormDiv.innerHTML = '';
+    this.contactsList.displayContactsAndInterface();
   }
 }
 
