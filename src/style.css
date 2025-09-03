@@ -1,43 +1,11 @@
-/* layout */
-#contacts-interface > div { margin: 1em; }
-
-#contacts-controls {
-  background: rgb(165, 221, 221);
-  padding: 1em;
-  width: 30%;
-}
-
-#contacts-controls:empty {
-  background: transparent;
-  padding: 0;
-}
-
-/* text */
-h1 { font-size: 16pt; margin: 1em; }
-
-li { list-style: none; padding-bottom: 1em; }
-
-dt, dd { display: inline; padding-right: .5em; }
-dd { font-family: monospace; }
-
-/* controls */
-button,
-input.search {
-  margin-right: 1em;
-  margin-bottom: 1em;
+div {
   padding: 0.5em;
-  border-radius: 0.5em;
 }
 
-/* form */
-#contact-form label { display: block; margin: 0.5em; }
-#contact-form input { margin: 0.5em; }
+li {
+  list-style: none;
+}
 
-fieldset.tags { padding-top: 0; }
-fieldset.tags > legend { display: block; margin-bottom: 0.25rem; }
-fieldset.tags > label {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  margin: 0.15rem 0 0.15rem 1rem; /* left indent */
+.hidden {
+  display: none;
 }

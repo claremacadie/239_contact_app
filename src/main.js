@@ -37,6 +37,10 @@ To do:
     - messages to user
       - when app does something, even involving another class, if an error message comes back, display it and tell user to refresh page?
       - messages about loading data?
+
+  - Think about where 'Add Contact' button functionality should be:
+    - Should there be a class for each 'page' of the app?
+    - Where do event listeners go? In the App class, or in the class of the page in which the button appears? I think it needs to be in the page class because the element only exists in that page.
 */
 
 class Contact {
@@ -125,8 +129,7 @@ class Contact {
 }
 
 class ContactForm {
-  constructor(url, app) {
-    this.url = url;
+  constructor(app) {
     this.app = app;
     this.init();
   }
@@ -208,7 +211,7 @@ class ContactForm {
     this.$cancelButton.textContent = 'Cancel';
     this.$cancelButton.setAttribute('type', 'button');
 
-    this.$form.setAttribute('action', this.url);
+    this.$form.setAttribute('action', this.app.url);
     this.$form.setAttribute('method', 'POST');
     this.$form.append(nameLabel, emailLabel, phoneLabel, tagsFieldset, tagsLabel, submitButton, this.$cancelButton);
   }
@@ -220,7 +223,7 @@ class ContactForm {
   
   handleCancelButton(event) {
     event.preventDefault();
-    this.app.resetContactListDisplay();
+    this.app.displayContactList();
   }
   
   init() {
@@ -236,31 +239,37 @@ class ContactForm {
   }
 }
 
-class ContactsList {
-  constructor(allContacts, tagOptions) {
-    this.allContacts = allContacts;
-    this.tagOptions = tagOptions;
+class ContactList {
+  constructor(app) {
+    this.app = app;
     this.init();
   }
 
   async init() {
-    this.filteredContacts = this.allContacts;
+    this.filteredContacts = this.app.allContacts;
     this.searchCriteria = {'name': '', 'tags': []};
 
-    this.$contactControlsDiv = document.getElementById("contacts-controls");
-    this.$contactListDiv = document.getElementById("contacts-list");
+    this.$buttonDiv = document.createElement('div');
+    this.$filterDiv = document.createElement('div');
+    this.$listDiv = document.createElement("div");
 
-    this.createControlsDivHTML();
-
-    this.populateControlsDiv();
+    this.createButtonDivHTML();
+    this.createFilterDivHTML();
     this.displayContacts();
 
     this.bind();
   }
 
   bind() {
+    this.$addContactButton.addEventListener('click', this.handleAddContact.bind(this));
     this.$searchInput.addEventListener('input', this.handleSearch.bind(this));
     this.$tagsFieldset.addEventListener('change', this.handleTagSelect.bind(this));
+  }
+
+  createButtonDivHTML() {
+    this.$addContactButton = document.createElement('button');
+    this.$addContactButton.textContent = "Add Contact";
+    this.$buttonDiv.append(this.$addContactButton);
   }
 
   populateTagsFieldset() {
@@ -270,7 +279,7 @@ class ContactsList {
     legend.textContent = 'Select tags:';
     this.$tagsFieldset.append(legend);
 
-    this.tagOptions.forEach(tagOption => {
+    this.app.tagOptions.forEach(tagOption => {
       let label = document.createElement('label');
       let labelText = document.createTextNode(tagOption);
       let input = document.createElement('input');
@@ -283,11 +292,7 @@ class ContactsList {
     });
   }
 
-  populateControlsDiv() {
-    this.$contactControlsDiv.append( this.$searchInput, this.$tagsFieldset);
-  }
-
-  createControlsDivHTML() {
+  createFilterDivHTML() {
     this.$searchInput = document.createElement('input');
     this.$searchInput.className = 'search';
     this.$searchInput.setAttribute('type', 'text');
@@ -295,20 +300,21 @@ class ContactsList {
 
     this.$tagsFieldset = document.createElement('fieldset');
     this.populateTagsFieldset();
+    this.$filterDiv.append( this.$searchInput, this.$tagsFieldset);
   }
 
   displayContacts() {
-    this.$contactListDiv.innerHTML = '';
+    this.$listDiv.innerHTML = '';
     this.filteredContacts.forEach(contact => {
-      this.$contactListDiv.append(contact.$li);
+      this.$listDiv.append(contact.$li);
     });
   }
 
   filterContacts() {
     if (this.searchCriteria['name'] === '') {
-      this.filteredContacts = this.allContacts;
+      this.filteredContacts = this.app.allContacts;
     } else {
-      this.filteredContacts = this.allContacts.filter(contactObj => contactObj.matchName(this.searchCriteria['name']));
+      this.filteredContacts = this.app.allContacts.filter(contactObj => contactObj.matchName(this.searchCriteria['name']));
     }
 
     if (this.searchCriteria['tags'].length === 0) {
@@ -318,11 +324,15 @@ class ContactsList {
     }
   }
 
-  redisplayContactsAndInterface() {
-    this.filteredContacts = this.allContacts;
+  redisplayContactList() {
+    this.filteredContacts = this.app.allContacts;
     this.searchCriteria = {'name': '', 'tags': []};
-    this.populateControlsDiv();
     this.displayContacts();
+  }
+
+  handleAddContact(event) {
+    event.preventDefault();
+    this.app.displayContactForm();
   }
 
   handleSearch(event) {
@@ -358,21 +368,21 @@ class App {
     this.allContacts = await this.getAllContacts();
     this.tagOptions = this.getTagOptions();
 
-    this.contactsList = new ContactsList(this.allContacts, this.tagOptions);
-    this.contactForm = new ContactForm(this.url, this);
+    this.contactList = new ContactList(this);
+    this.$contactInterfaceDiv = document.getElementById("contact-interface");
+    this.$contactInterfaceDiv.append(this.contactList.$buttonDiv, this.contactList.$filterDiv, this.contactList.$listDiv);
 
-    this.$contactButtonsDiv = document.getElementById("contacts-buttons");
-    this.$contactFormDiv = document.getElementById('contact-form')
+    this.contactForm = new ContactForm(this);
+    this.$contactFormDiv = document.getElementById('contact-form');
+    this.$contactFormDiv.append(this.contactForm.$form);
+    this.$contactFormDiv.classList.add('hidden');
     this.$userMessage = document.getElementById("user-message");
     this.$errorMessage = document.getElementById("error-message");
-
-    this.createButtonsDivHTML();
 
     this.bind();
   }
   
   bind() {
-    this.$addContactButton.addEventListener('click', this.handleAddContact.bind(this));
     // Use this for debugging: this.$userMessage.textContent
   }
 
@@ -402,32 +412,14 @@ class App {
     }, []).sort();
   }
 
-  createButtonsDivHTML() {
-    this.$addContactButton = document.createElement('button');
-    this.$addContactButton.textContent = "Add Contact";
-    this.populateButtonsDiv();
+  displayContactForm() {
+    this.$contactInterfaceDiv.classList.add('hidden');
+    this.$contactFormDiv.classList.remove('hidden');
   }
 
-  handleAddContact(event) {
-    event.preventDefault();
-    this.$contactButtonsDiv.innerHTML = '';
-    this.contactsList.$contactControlsDiv.innerHTML = '';
-    this.contactsList.$contactListDiv.innerHTML = '';
-    this.populateContactForm();
-  }
-
-  populateButtonsDiv() {
-    this.$contactButtonsDiv.append(this.$addContactButton);
-  }
-
-  populateContactForm() {
-    this.$contactFormDiv.append(this.contactForm.$form);
-  }
-
-  resetContactListDisplay() {
-    this.$contactFormDiv.innerHTML = '';
-    this.populateButtonsDiv();
-    this.contactsList.redisplayContactsAndInterface();
+  displayContactList() {
+    this.$contactFormDiv.classList.add('hidden');
+    this.$contactInterfaceDiv.classList.remove('hidden');
   }
 }
 
