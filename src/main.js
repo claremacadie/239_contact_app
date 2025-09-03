@@ -318,7 +318,7 @@ class ContactsList {
     }
   }
 
-  displayContactsAndInterface() {
+  redisplayContactsAndInterface() {
     this.filteredContacts = this.allContacts;
     this.searchCriteria = {'name': '', 'tags': []};
     this.populateControlsDiv();
@@ -426,7 +426,8 @@ class App {
 
   resetContactListDisplay() {
     this.$contactFormDiv.innerHTML = '';
-    this.contactsList.displayContactsAndInterface();
+    this.populateButtonsDiv();
+    this.contactsList.redisplayContactsAndInterface();
   }
 }
 
