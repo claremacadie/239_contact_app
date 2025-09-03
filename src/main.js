@@ -22,15 +22,11 @@ Classes:
 
 To do:
   - Create add Contact functionality
-    - Ensure new tags are lowercase
     - fetch(send) data, error handling
 
-  - Beware using the same form for editing a contact because the `method` attribute is PUT, not POST
-
-  - When should data be fetched? What if other people are adding contacts?
-    - Use setInterval to call every minute?
-  - When should tagOptions be fetched? Especially for add contact form.
-    - Every time data is fetched?
+  - Edit/Delete contact
+    - Need to put id as data attribute somewhere in the Contact HTML
+    - Beware using the same form for editing a contact because the `method` attribute is PUT, not POST
 
   - Error handling:
     - try/catch for all fetch
@@ -38,9 +34,12 @@ To do:
       - when app does something, even involving another class, if an error message comes back, display it and tell user to refresh page?
       - messages about loading data?
 
-  - Think about where 'Add Contact' button functionality should be:
-    - Should there be a class for each 'page' of the app?
-    - Where do event listeners go? In the App class, or in the class of the page in which the button appears? I think it needs to be in the page class because the element only exists in that page.
+  - When should data be fetched? What if other people are adding contacts?
+    - Use setInterval to call every minute?
+  - When should tagOptions be fetched? Especially for add contact form.
+    - Every time data is fetched?
+  - Use debounce?
+  - Cancel requests if another one comes in?
 */
 
 class Contact {
@@ -138,6 +137,7 @@ class ContactForm {
     let nameLabel = document.createElement('label');
     nameLabel.textContent = "Full name:";
     let nameInput = document.createElement('input');
+    nameInput.name = 'name';
     nameInput.setAttribute('type', 'text');
     nameLabel.append(nameInput);
     return nameLabel;
@@ -147,6 +147,7 @@ class ContactForm {
     let emailLabel = document.createElement('label');
     emailLabel.textContent = "Email address:";
     let emailInput = document.createElement('input');
+    emailInput.name = 'email';
     emailInput.setAttribute('type', 'email');
     emailLabel.append(emailInput);
     return emailLabel;
@@ -156,6 +157,7 @@ class ContactForm {
     let phoneLabel = document.createElement('label');
     phoneLabel.textContent = "Telephone number:";
     let phoneInput = document.createElement('input');
+    phoneInput.name = 'phone';
     phoneInput.setAttribute('type', 'text');
     phoneLabel.append(phoneInput);
     return phoneLabel;
@@ -164,7 +166,7 @@ class ContactForm {
   createTagsFieldsetHTML() {
     let tagsFieldset = document.createElement('fieldset');
     tagsFieldset.className = 'tags';
-      
+    
     let legend = document.createElement('legend');
     legend.textContent = 'Select tags:';
     tagsFieldset.append(legend);
@@ -173,8 +175,9 @@ class ContactForm {
       let label = document.createElement('label');
       let labelText = document.createTextNode(tagOption);
       let input = document.createElement('input');
+      input.name = 'selected-tags';
       input.setAttribute('type', 'checkbox');
-      input.setAttribute('name', 'tags');
+      // input.setAttribute('name', `selectedTag-${tagOption}`);
       input.setAttribute('value', tagOption);
       label.append(input, labelText);
 
@@ -188,6 +191,7 @@ class ContactForm {
     let tagsLabel = document.createElement('label');
     tagsLabel.textContent = "Add new tags, comma-separated";
     let tagsInput = document.createElement('input');
+    tagsInput.name = 'new-tags';
     tagsInput.setAttribute('type', 'text');
     tagsLabel.append(tagsInput);
     return tagsLabel;
@@ -216,9 +220,48 @@ class ContactForm {
     this.$form.append(nameLabel, emailLabel, phoneLabel, tagsFieldset, tagsLabel, submitButton, this.$cancelButton);
   }
 
+  extractData(formData) {
+    let data = Object.fromEntries(formData.entries());
+    let selectedTags = formData.getAll('selected-tags');
+    let newTags = data['new-tags']
+                  .split(',')
+                  .map(tag => tag.trim().toLowerCase())
+                  .filter(tag => tag);
+    
+    let allTags = [... new Set(selectedTags.concat(newTags))];
+
+    data['tags'] = allTags;
+    delete data['selected-tags'];
+    delete data['new-tags'];
+    return data;
+  }
+
+  validateInputs(data) {
+    // name: must be a string of letters
+    // email: must match easy email regex
+    // phone: must match easy phone number regex
+    // tags: must be strings of letters
+    // post messages if invalid, use a flag for whether data is valid?
+  }
+
+  formatDataToSend(data) {
+    // change tags array to comma separated list
+    // JSON.stringify
+  }
+
+  sendData(data) {
+    // use try/catch with fetch
+    // post messages if fetch doesn't work
+  }
+
   handleFormSubmit(event) {
     event.preventDefault();
-    this.app.$userMessage.textContent = 'Handle Form Submit';
+    let data = this.extractData(new FormData(this.$form));
+
+    // use a flag for whether data is valid? or put the rest in try/catch block?
+    this.validateInputs(data);  
+    let dataToSend = this.formatDataToSend(data);
+    this.sendData(dataToSend);
   }
   
   handleCancelButton(event) {
@@ -379,10 +422,6 @@ class App {
     this.$userMessage = document.getElementById("user-message");
     this.$errorMessage = document.getElementById("error-message");
 
-    this.bind();
-  }
-  
-  bind() {
     // Use this for debugging: this.$userMessage.textContent
   }
 
