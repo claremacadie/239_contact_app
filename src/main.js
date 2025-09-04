@@ -127,14 +127,33 @@ class ContactForm {
   constructor(app) {
     this.app = app;
     this.init();
-    this.createFormHTML();
-    this.populateFormHTML();
+    this.createHTML();
+    this.populateHTML();
     this.bind();
   }
 
   init() {
     this.$form = document.createElement('form');
     this.$cancelButton = document.createElement('button');
+  }
+
+  createHTML() {
+    let nameLabel = this.createLabelHTML("Full name:", 'name', 'text');
+    let emailLabel = this.createLabelHTML("Email address:", 'email', 'email');
+    let phoneLabel = this.createLabelHTML("Telephone number:", 'phone', 'text');
+    let tagsFieldset = this.createTagsFieldsetHTML();
+    let tagsLabel = this.createTagsLabelHTML();
+    let submitButton = this.createSubmitButtonHTML();
+
+    this.$form.append(nameLabel, emailLabel, phoneLabel, tagsFieldset, tagsLabel, submitButton, this.$cancelButton);
+  }
+
+  populateHTML() {
+    this.$cancelButton.textContent = 'Cancel';
+    this.$cancelButton.setAttribute('type', 'button');
+
+    this.$form.setAttribute('action', this.app.url);
+    this.$form.setAttribute('method', 'POST');
   }
   
   bind() {
@@ -190,25 +209,6 @@ class ContactForm {
     submitButton.textContent = 'Submit';
     submitButton.setAttribute('type', 'submit');
     return submitButton;
-  }
-
-  createFormHTML() {
-    let nameLabel = this.createLabelHTML("Full name:", 'name', 'text');
-    let emailLabel = this.createLabelHTML("Email address:", 'email', 'email');
-    let phoneLabel = this.createLabelHTML("Telephone number:", 'phone', 'text');
-    let tagsFieldset = this.createTagsFieldsetHTML();
-    let tagsLabel = this.createTagsLabelHTML();
-    let submitButton = this.createSubmitButtonHTML();
-
-    this.$form.append(nameLabel, emailLabel, phoneLabel, tagsFieldset, tagsLabel, submitButton, this.$cancelButton);
-  }
-
-  populateFormHTML() {
-    this.$cancelButton.textContent = 'Cancel';
-    this.$cancelButton.setAttribute('type', 'button');
-
-    this.$form.setAttribute('action', this.app.url);
-    this.$form.setAttribute('method', 'POST');
   }
 
   extractData(formData) {
