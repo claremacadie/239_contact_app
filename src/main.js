@@ -15,14 +15,16 @@ Edit Contact Form:
 Classes:
   - App
   - Contact
+  - ContactList
+  - ContactForm
+  - FetchData
   - HTMLTemplate?
-  - Form?
-  - Search/Display contacts
-  - Fetching data, inc error handling
 
 To do:
   - Create add Contact functionality
     - fetch(send) data, error handling
+
+  - use FetchData class for fetching contacts in App class
 
   - Edit/Delete contact
     - Need to put id as data attribute somewhere in the Contact HTML
@@ -177,7 +179,6 @@ class ContactForm {
       let input = document.createElement('input');
       input.name = 'selected-tags';
       input.setAttribute('type', 'checkbox');
-      // input.setAttribute('name', `selectedTag-${tagOption}`);
       input.setAttribute('value', tagOption);
       label.append(input, labelText);
 
@@ -249,19 +250,18 @@ class ContactForm {
     // JSON.stringify
   }
 
-  sendData(data) {
-    // use try/catch with fetch
-    // post messages if fetch doesn't work
-  }
-
-  handleFormSubmit(event) {
+  async handleFormSubmit(event) {
     event.preventDefault();
     let data = this.extractData(new FormData(this.$form));
 
-    // use a flag for whether data is valid? or put the rest in try/catch block?
-    this.validateInputs(data);  
-    let dataToSend = this.formatDataToSend(data);
-    this.sendData(dataToSend);
+    try {
+      this.validateInputs(data);  
+      let dataToSend = this.formatDataToSend(data);
+      let response = await new FetchData(dataToSend); // create new class
+      // do something with response
+    } catch(error) {
+      // do something with error
+    }
   }
   
   handleCancelButton(event) {
