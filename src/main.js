@@ -197,7 +197,7 @@ class ContactForm {
     let tagsFieldset = this.createTagsFieldsetHTML();
     let tagsLabel = this.createTagsLabelHTML();
     let submitButton = this.createSubmitButtonHTML();
-    
+
     this.$form.append(nameLabel, emailLabel, phoneLabel, tagsFieldset, tagsLabel, submitButton, this.$cancelButton);
   }
 
@@ -261,34 +261,41 @@ class ContactForm {
 class ContactList {
   constructor(app) {
     this.app = app;
+    
     this.init();
+    this.createHTML();
+    this.populateHTML();
+    this.bind();
   }
 
-  async init() {
+  init() {
     this.filteredContacts = this.app.allContacts;
     this.searchCriteria = {'name': '', 'tags': []};
 
     this.$buttonDiv = document.createElement('div');
-    this.$filterDiv = document.createElement('div');
-    this.$listDiv = document.createElement("div");
-
-    this.createButtonDivHTML();
-    this.createFilterDivHTML();
-    this.displayContacts();
-
-    this.bind();
-  }
-
-  bind() {
-    this.$addContactButton.addEventListener('click', this.handleAddContact.bind(this));
-    this.$searchInput.addEventListener('input', this.handleSearch.bind(this));
-    this.$tagsFieldset.addEventListener('change', this.handleTagSelect.bind(this));
-  }
-
-  createButtonDivHTML() {
     this.$addContactButton = document.createElement('button');
-    this.$addContactButton.textContent = "Add Contact";
+
+    this.$filterDiv = document.createElement('div');
+    this.$searchInput = document.createElement('input');
+    this.$tagsFieldset = document.createElement('fieldset');
+
+    this.$listDiv = document.createElement("div");
+  }
+  
+  createHTML() {
     this.$buttonDiv.append(this.$addContactButton);
+    this.$addContactButton.textContent = "Add Contact";
+    
+    this.$filterDiv.append( this.$searchInput, this.$tagsFieldset);
+
+    this.$searchInput.className = 'search';
+    this.$searchInput.setAttribute('type', 'text');
+    this.$searchInput.setAttribute('placeholder', 'Search');
+  }
+  
+  populateHTML() {
+    this.populateTagsFieldset();
+    this.displayContacts();
   }
 
   populateTagsFieldset() {
@@ -309,17 +316,6 @@ class ContactList {
 
       this.$tagsFieldset.append(label);
     });
-  }
-
-  createFilterDivHTML() {
-    this.$searchInput = document.createElement('input');
-    this.$searchInput.className = 'search';
-    this.$searchInput.setAttribute('type', 'text');
-    this.$searchInput.setAttribute('placeholder', 'Search');
-
-    this.$tagsFieldset = document.createElement('fieldset');
-    this.populateTagsFieldset();
-    this.$filterDiv.append( this.$searchInput, this.$tagsFieldset);
   }
 
   displayContacts() {
@@ -343,7 +339,7 @@ class ContactList {
     }
   }
 
-  redisplayContactList() {
+  refreshContactList() {
     this.filteredContacts = this.app.allContacts;
     this.searchCriteria = {'name': '', 'tags': []};
     this.displayContacts();
@@ -374,6 +370,12 @@ class ContactList {
     this.searchCriteria['tags'] = selectedTags;
     this.filterContacts();
     this.displayContacts();
+  }
+
+  bind() {
+    this.$addContactButton.addEventListener('click', this.handleAddContact.bind(this));
+    this.$searchInput.addEventListener('input', this.handleSearch.bind(this));
+    this.$tagsFieldset.addEventListener('change', this.handleTagSelect.bind(this));
   }
 }
 
