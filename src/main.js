@@ -51,7 +51,7 @@ class Contact {
     this.email = obj['email'];
     this.phone = obj['phone-number'];
     this.tags = obj['tags'] === null ? [] : obj['tags'].split(',');
-    
+
     this.init();
     this.createHTML();
     this.populateHTML();
@@ -127,34 +127,27 @@ class ContactForm {
     this.init();
   }
 
-  createNameLabelHTML() {
+  init() {
+    this.$form = document.createElement('form');
+    this.$cancelButton = document.createElement('button');
+    this.createFormHTML();
+    this.populateFormHTML();
+    this.bind();
+  }
+  
+  bind() {
+    this.$form.addEventListener('submit', this.handleFormSubmit.bind(this));
+    this.$cancelButton.addEventListener('click', this.handleCancelButton.bind(this));
+  }
+
+  createLabelHTML(labelText, inputName, inputType) {
     let nameLabel = document.createElement('label');
-    nameLabel.textContent = "Full name:";
+    nameLabel.textContent = labelText;
     let nameInput = document.createElement('input');
-    nameInput.name = 'name';
-    nameInput.setAttribute('type', 'text');
+    nameInput.name = inputName;
+    nameInput.setAttribute('type', inputType);
     nameLabel.append(nameInput);
     return nameLabel;
-  }
-
-  createEmailLabelHTML() {
-    let emailLabel = document.createElement('label');
-    emailLabel.textContent = "Email address:";
-    let emailInput = document.createElement('input');
-    emailInput.name = 'email';
-    emailInput.setAttribute('type', 'email');
-    emailLabel.append(emailInput);
-    return emailLabel;
-  }
-
-  createPhoneLabelHTML() {
-    let phoneLabel = document.createElement('label');
-    phoneLabel.textContent = "Telephone number:";
-    let phoneInput = document.createElement('input');
-    phoneInput.name = 'phone';
-    phoneInput.setAttribute('type', 'text');
-    phoneLabel.append(phoneInput);
-    return phoneLabel;
   }
 
   createTagsFieldsetHTML() {
@@ -198,19 +191,22 @@ class ContactForm {
   }
 
   createFormHTML() {
-    let nameLabel = this.createNameLabelHTML();
-    let emailLabel = this.createEmailLabelHTML();
-    let phoneLabel = this.createPhoneLabelHTML();
+    let nameLabel = this.createLabelHTML("Full name:", 'name', 'text');
+    let emailLabel = this.createLabelHTML("Email address:", 'email', 'email');
+    let phoneLabel = this.createLabelHTML("Telephone number:", 'phone', 'text');
     let tagsFieldset = this.createTagsFieldsetHTML();
     let tagsLabel = this.createTagsLabelHTML();
     let submitButton = this.createSubmitButtonHTML();
+    
+    this.$form.append(nameLabel, emailLabel, phoneLabel, tagsFieldset, tagsLabel, submitButton, this.$cancelButton);
+  }
 
+  populateFormHTML() {
     this.$cancelButton.textContent = 'Cancel';
     this.$cancelButton.setAttribute('type', 'button');
 
     this.$form.setAttribute('action', this.app.url);
     this.$form.setAttribute('method', 'POST');
-    this.$form.append(nameLabel, emailLabel, phoneLabel, tagsFieldset, tagsLabel, submitButton, this.$cancelButton);
   }
 
   extractData(formData) {
@@ -259,18 +255,6 @@ class ContactForm {
   handleCancelButton(event) {
     event.preventDefault();
     this.app.displayContactList();
-  }
-  
-  init() {
-    this.$form = document.createElement('form');
-    this.$cancelButton = document.createElement('button');
-    this.createFormHTML();
-    this.bind();
-  }
-  
-  bind() {
-    this.$form.addEventListener('submit', this.handleFormSubmit.bind(this));
-    this.$cancelButton.addEventListener('click', this.handleCancelButton.bind(this));
   }
 }
 
