@@ -21,6 +21,8 @@ Classes:
   - HTMLTemplate?
 
 To do:
+  - All binding and handlers should be in App class
+
   - Create add Contact functionality
     - fetch(send) data, error handling
 
@@ -125,14 +127,14 @@ class ContactForm {
   constructor(app) {
     this.app = app;
     this.init();
+    this.createFormHTML();
+    this.populateFormHTML();
+    this.bind();
   }
 
   init() {
     this.$form = document.createElement('form');
     this.$cancelButton = document.createElement('button');
-    this.createFormHTML();
-    this.populateFormHTML();
-    this.bind();
   }
   
   bind() {
@@ -261,7 +263,7 @@ class ContactForm {
 class ContactList {
   constructor(app) {
     this.app = app;
-    
+
     this.init();
     this.createHTML();
     this.populateHTML();
@@ -390,17 +392,28 @@ class App {
     this.tagOptions = this.getTagOptions();
 
     this.contactList = new ContactList(this);
-    this.$contactInterfaceDiv = document.getElementById("contact-interface");
-    this.$contactInterfaceDiv.append(this.contactList.$buttonDiv, this.contactList.$filterDiv, this.contactList.$listDiv);
-
     this.contactForm = new ContactForm(this);
+
+    this.$contactInterfaceDiv = document.getElementById("contact-interface");
     this.$contactFormDiv = document.getElementById('contact-form');
-    this.$contactFormDiv.append(this.contactForm.$form);
-    this.$contactFormDiv.classList.add('hidden');
     this.$userMessage = document.getElementById("user-message");
     this.$errorMessage = document.getElementById("error-message");
 
-    // Use this for debugging: this.$userMessage.textContent
+    this.createHTML();
+    this.populateHTML();
+  }
+  
+  createHTML() {
+    this.$contactInterfaceDiv.append(
+      this.contactList.$buttonDiv, 
+      this.contactList.$filterDiv, 
+      this.contactList.$listDiv
+    );
+    this.$contactFormDiv.append(this.contactForm.$form);
+  }
+  
+  populateHTML() {
+    this.$contactFormDiv.classList.add('hidden');
   }
 
   async fetchContacts() {
@@ -416,6 +429,7 @@ class App {
   }
 
   async getAllContacts() {
+    // add try/catch
     let contactsArr = await this.fetchContacts();
     return contactsArr.map(contact => new Contact(contact));
   }
