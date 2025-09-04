@@ -51,8 +51,24 @@ class Contact {
     this.email = obj['email'];
     this.phone = obj['phone-number'];
     this.tags = obj['tags'] === null ? [] : obj['tags'].split(',');
+    
     this.init();
+    this.createHTML();
     this.populateHTML();
+  }
+
+  init() {
+    this.$li = document.createElement('li');
+    this.$nameH3 = document.createElement('h3');
+    this.$contactDetailsDl = document.createElement('dl');
+
+    this.$phoneDiv = document.createElement('div');
+    this.$emailDiv = document.createElement('div');
+    this.$tagsDiv = document.createElement('div');
+
+    this.$buttonsDiv = document.createElement('div');
+    this.$editButton = document.createElement('button');
+    this.$deleteButton = document.createElement('button');
   }
 
   matchName(searchText) {
@@ -68,64 +84,40 @@ class Contact {
   }
 
   addContactDetailsDivHTML() {
-    this.$phoneDiv = document.createElement('div');
-    this.addPhoneDivHTML();
-    this.$emailDiv = document.createElement('div');
-    this.addEmailDivHTML();
-    this.$tagsDiv = document.createElement('div');
-    this.addTagsDivHTML();
+    this.createInputDivHTML(this.$phoneDiv, 'Phone Number:')
+    this.createInputDivHTML(this.$emailDiv, 'Email:')
+    this.createInputDivHTML(this.$tagsDiv, 'Tags:')
+
     this.$contactDetailsDl.append(this.$phoneDiv, this.$emailDiv, this.$tagsDiv);
   }
 
-  addPhoneDivHTML() {
-    this.$phoneDt = document.createElement('dt');
-    this.$phoneDt.textContent = 'Phone Number:';
-    this.$phoneDd = document.createElement('dd');
-    this.$phoneDiv.append(this.$phoneDt, this.$phoneDd);
-  }
-
-  addEmailDivHTML() {
-    this.$emailDt = document.createElement('dt');
-    this.$emailDt.textContent = 'Email:';
-    this.$emailDd = document.createElement('dd');
-    this.$emailDiv.append(this.$emailDt, this.$emailDd);
-  }
-
-  addTagsDivHTML() {
-    this.$tagsDt = document.createElement('dt');
-    this.$tagsDt.textContent = 'Tags:';
-    this.$tagsDd = document.createElement('dd');
-    this.$tagsDiv.append(this.$tagsDt, this.$tagsDd);
+  createInputDivHTML(div, dtText) {
+    let dt = document.createElement('dt');
+    dt.textContent = dtText;
+    let dd = document.createElement('dd');
+    div.append(dt, dd);
   }
 
   addButtonsDivHTML() {
-    this.$editButton = document.createElement('button');
     this.$editButton.textContent = 'Edit';
     this.$editButton.classList.add('edit-button');
-    this.$deleteButton = document.createElement('button');
     this.$deleteButton.textContent = 'Delete';
     this.$deleteButton.classList.add('delete-button');
     this.$buttonsDiv.append(this.$editButton, this.$deleteButton);
   }
 
+  createHTML() {
+    this.addContactDetailsDivHTML();
+    this.addButtonsDivHTML();
+    this.$li.append(this.$nameH3, this.$contactDetailsDl, this.$buttonsDiv);
+  }
+  
   populateHTML() {
     this.$li.dataset['contactId'] = this.id;
     this.$nameH3.textContent = this.name;
-    this.$phoneDd.textContent = this.phone || 'None';
-    this.$emailDd.textContent = this.email || 'None';
-    this.$tagsDd.textContent = this.tags.length === 0 ? 'None' : this.tags.join(', ');
-  }
-  
-  init() {
-    this.$li = document.createElement('li');
-
-    this.$nameH3 = document.createElement('h3');
-    this.$contactDetailsDl = document.createElement('dl');
-    this.addContactDetailsDivHTML();
-    this.$buttonsDiv = document.createElement('div');
-    this.addButtonsDivHTML();
-
-    this.$li.append(this.$nameH3, this.$contactDetailsDl, this.$buttonsDiv);
+    this.$phoneDiv.querySelector('dd').textContent = this.phone || 'None';
+    this.$emailDiv.querySelector('dd').textContent = this.email || 'None';
+    this.$tagsDiv.querySelector('dd').textContent = this.tags.length === 0 ? 'None' : this.tags.join(', ');
   }
 }
 
