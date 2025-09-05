@@ -99,8 +99,6 @@ Classes:
   - HTMLTemplate?
 
 To do:
-- Fix cancelAddContact button
-
 - Create add Contact functionality
     - fetch(send) data, error handling
 

@@ -48,7 +48,8 @@ export default class AppController {
     console.log(data);
     try {
       this.validateInputs(data);  
-      // let dataToSend = this.formatDataToSend(data);
+      let dataToSend = this.formatDataToSend(data);
+      console.log(dataToSend)
       // let response = await new FetchData(dataToSend); // create new class
       // do something with response
     } catch(error) {
@@ -102,7 +103,7 @@ export default class AppController {
   }
 
   formatDataToSend(data) {
-    // change tags array to comma separated list
-    // JSON.stringify
+    data.tags = data.tags.join(', ');
+    return JSON.stringify(data);
   }
 }
