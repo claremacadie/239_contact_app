@@ -52,7 +52,8 @@ export default class AppController {
       // let response = await new FetchData(dataToSend); // create new class
       // do something with response
     } catch(error) {
-      // do something with error
+      console.log(error.message);
+      this.app.$errorMessage.textContent = error.message;
     }
   }
   
@@ -65,6 +66,9 @@ export default class AppController {
 
   extractData(formData) {
     let data = Object.fromEntries(formData.entries());
+    for (let key in data) {
+      data[key] = data[key].trim();
+    }
     let selectedTags = formData.getAll('selected-tags');
     let newTags = data['new-tags']
                   .split(',')
@@ -80,11 +84,15 @@ export default class AppController {
   }
 
   validateInputs(data) {
-    // name: must be a string of letters
-    // email: must match easy email regex
-    // phone: must match easy phone number regex
-    // tags: must be strings of letters
-    // post messages if invalid, use a flag for whether data is valid?
+    let invalidEntries = [];
+    if (!data.name.match(/^(?=.{2,50}$)[A-Za-z][A-Za-z .'-]*[A-Za-z]$/)) invalidEntries.push('Full name');
+    if (!data.email.match(/^(?=.{2,50}$)[A-Za-z][A-Za-z .'-]*[A-Za-z]$/)) invalidEntries.push('Email');
+    if (!data.phone.match(/^(?=(?:.*\d){7,15}$)[+()\-.\s\d]+$/)) invalidEntries.push('Telephone number');
+    if (!data.tags.every(tag => tag.match(/^[A-Za-z]+$/))) invalidEntries.push('Tag names');
+
+    if (invalidEntries.length !== 0) {
+      throw new Error(`These fields have invalid values: ${invalidEntries.join(', ')}`);
+    }
   }
 
   formatDataToSend(data) {
