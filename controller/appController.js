@@ -85,10 +85,16 @@ export default class AppController {
 
   validateInputs(data) {
     let invalidEntries = [];
-    if (!data.name.match(/^(?=.{2,50}$)[A-Za-z][A-Za-z .'-]*[A-Za-z]$/)) invalidEntries.push('Full name');
-    if (!data.email.match(/^(?=.{2,50}$)[A-Za-z][A-Za-z .'-]*[A-Za-z]$/)) invalidEntries.push('Email');
-    if (!data.phone.match(/^(?=(?:.*\d){7,15}$)[+()\-.\s\d]+$/)) invalidEntries.push('Telephone number');
-    if (!data.tags.every(tag => tag.match(/^[A-Za-z]+$/))) invalidEntries.push('Tag names');
+
+    const namePattern = /^(?=.{2,50}$)[A-Za-z][A-Za-z .'-]*[A-Za-z]$/;
+    const emailPattern = /^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}$/i;
+    const phonePattern = /^(?=(?:.*\d){7,15}$)[+()\-.\s\d]+$/;
+    const tagPattern = /^[A-Za-z]+$/;
+
+    if (!data.name.match(namePattern)) invalidEntries.push('Full name');
+    if (!data.email.match(emailPattern)) invalidEntries.push('Email');
+    if (!data.phone.match(phonePattern)) invalidEntries.push('Telephone number');
+    if (!data.tags.every(tag => tag.match(tagPattern))) invalidEntries.push('Tag names');
 
     if (invalidEntries.length !== 0) {
       throw new Error(`These fields have invalid values: ${invalidEntries.join(', ')}`);
