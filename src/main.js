@@ -55,8 +55,6 @@ class Contact {
     this.tags = obj['tags'] === null ? [] : obj['tags'].split(',');
 
     this.init();
-    this.createHTML();
-    this.populateHTML();
   }
 
   init() {
@@ -71,6 +69,9 @@ class Contact {
     this.$buttonsDiv = document.createElement('div');
     this.$editButton = document.createElement('button');
     this.$deleteButton = document.createElement('button');
+
+    this.createHTML();
+    this.populateHTML();
   }
 
   matchName(searchText) {
@@ -127,14 +128,14 @@ class ContactForm {
   constructor(app) {
     this.app = app;
     this.init();
-    this.createHTML();
-    this.populateHTML();
-    this.bind();
   }
 
   init() {
     this.$form = document.createElement('form');
     this.$cancelButton = document.createElement('button');
+
+    this.createHTML();
+    this.populateHTML();
   }
 
   createHTML() {
@@ -154,11 +155,6 @@ class ContactForm {
 
     this.$form.setAttribute('action', this.app.url);
     this.$form.setAttribute('method', 'POST');
-  }
-  
-  bind() {
-    this.$form.addEventListener('submit', this.handleFormSubmit.bind(this));
-    this.$cancelButton.addEventListener('click', this.handleCancelButton.bind(this));
   }
 
   createLabelHTML(labelText, inputName, inputType) {
@@ -263,11 +259,7 @@ class ContactForm {
 class ContactList {
   constructor(app) {
     this.app = app;
-
     this.init();
-    this.createHTML();
-    this.populateHTML();
-    this.bind();
   }
 
   init() {
@@ -276,12 +268,13 @@ class ContactList {
 
     this.$buttonDiv = document.createElement('div');
     this.$addContactButton = document.createElement('button');
-
     this.$filterDiv = document.createElement('div');
     this.$searchInput = document.createElement('input');
     this.$tagsFieldset = document.createElement('fieldset');
-
     this.$listDiv = document.createElement("div");
+
+    this.createHTML();
+    this.populateHTML();
   }
   
   createHTML() {
@@ -373,12 +366,6 @@ class ContactList {
     this.filterContacts();
     this.displayContacts();
   }
-
-  bind() {
-    this.$addContactButton.addEventListener('click', this.handleAddContact.bind(this));
-    this.$searchInput.addEventListener('input', this.handleSearch.bind(this));
-    this.$tagsFieldset.addEventListener('change', this.handleTagSelect.bind(this));
-  }
 }
 
 class App {
@@ -386,21 +373,30 @@ class App {
     this.url = url;
     this.init();
   }
-
+  
   async init() {
     this.allContacts = await this.getAllContacts();
     this.tagOptions = this.getTagOptions();
-
+    
     this.contactList = new ContactList(this);
     this.contactForm = new ContactForm(this);
-
+    
     this.$contactInterfaceDiv = document.getElementById("contact-interface");
     this.$contactFormDiv = document.getElementById('contact-form');
     this.$userMessage = document.getElementById("user-message");
     this.$errorMessage = document.getElementById("error-message");
-
+    
     this.createHTML();
     this.populateHTML();
+    this.bind();
+  }
+
+  bind() {
+    this.contactForm.$form.addEventListener('submit', this.contactForm.handleFormSubmit.bind(this.contactForm));
+    this.contactForm.$cancelButton.addEventListener('click', this.contactForm.handleCancelButton.bind(this.contactForm));
+    this.contactList.$addContactButton.addEventListener('click', this.contactList.handleAddContact.bind(this.contactList));
+    this.contactList.$searchInput.addEventListener('input', this.contactList.handleSearch.bind(this.contactList));
+    this.contactList.$tagsFieldset.addEventListener('change', this.contactList.handleTagSelect.bind(this.contactList));
   }
   
   createHTML() {
