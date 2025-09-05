@@ -206,54 +206,6 @@ class ContactForm {
     submitButton.setAttribute('type', 'submit');
     return submitButton;
   }
-
-  extractData(formData) {
-    let data = Object.fromEntries(formData.entries());
-    let selectedTags = formData.getAll('selected-tags');
-    let newTags = data['new-tags']
-                  .split(',')
-                  .map(tag => tag.trim().toLowerCase())
-                  .filter(tag => tag);
-    
-    let allTags = [... new Set(selectedTags.concat(newTags))];
-
-    data['tags'] = allTags;
-    delete data['selected-tags'];
-    delete data['new-tags'];
-    return data;
-  }
-
-  validateInputs(data) {
-    // name: must be a string of letters
-    // email: must match easy email regex
-    // phone: must match easy phone number regex
-    // tags: must be strings of letters
-    // post messages if invalid, use a flag for whether data is valid?
-  }
-
-  formatDataToSend(data) {
-    // change tags array to comma separated list
-    // JSON.stringify
-  }
-
-  async handleFormSubmit(event) {
-    event.preventDefault();
-    let data = this.extractData(new FormData(this.$form));
-
-    try {
-      this.validateInputs(data);  
-      let dataToSend = this.formatDataToSend(data);
-      let response = await new FetchData(dataToSend); // create new class
-      // do something with response
-    } catch(error) {
-      // do something with error
-    }
-  }
-  
-  handleCancelButton(event) {
-    event.preventDefault();
-    this.app.displayContactList();
-  }
 }
 
 class ContactList {
@@ -359,7 +311,7 @@ class ContactList {
   }
 }
 
-class Controller {
+class AppController {
   constructor(app) {
     this.app = app;
     this.init();
@@ -378,8 +330,8 @@ class Controller {
   }
 
   bind() {
-    this.$addContactForm.addEventListener('submit', this.contactForm.handleFormSubmit.bind(this.contactForm));
-    this.$cancelAddContactButton.addEventListener('click', this.contactForm.handleCancelButton.bind(this.contactForm));
+    this.$addContactForm.addEventListener('submit', this.handleFormSubmit.bind(this));
+    this.$cancelAddContactButton.addEventListener('click', this.handleCancelButton.bind(this));
 
     this.$addContactButton.addEventListener('click', this.handleAddContact.bind(this));
     this.$searchInput.addEventListener('input', this.handleSearch.bind(this));
@@ -402,6 +354,55 @@ class Controller {
     this.contactList.updateTagSelectCriteria();
     this.contactList.reloadContactList();
   }
+  
+  async handleFormSubmit(event) {
+    event.preventDefault();
+    let data = this.extractData(new FormData(this.$addContactForm));
+    console.log(data);
+    // try {
+    //   this.validateInputs(data);  
+    //   let dataToSend = this.formatDataToSend(data);
+    //   let response = await new FetchData(dataToSend); // create new class
+    //   // do something with response
+    // } catch(error) {
+    //   // do something with error
+    // }
+  }
+  
+  handleCancelButton(event) {
+    event.preventDefault();
+    this.contactList.resetSearchCriteria();
+    this.contactList.reloadContactList();
+  }
+
+  extractData(formData) {
+    let data = Object.fromEntries(formData.entries());
+    let selectedTags = formData.getAll('selected-tags');
+    let newTags = data['new-tags']
+                  .split(',')
+                  .map(tag => tag.trim().toLowerCase())
+                  .filter(tag => tag);
+    
+    let allTags = [... new Set(selectedTags.concat(newTags))];
+
+    data['tags'] = allTags;
+    delete data['selected-tags'];
+    delete data['new-tags'];
+    return data;
+  }
+
+  validateInputs(data) {
+    // name: must be a string of letters
+    // email: must match easy email regex
+    // phone: must match easy phone number regex
+    // tags: must be strings of letters
+    // post messages if invalid, use a flag for whether data is valid?
+  }
+
+  formatDataToSend(data) {
+    // change tags array to comma separated list
+    // JSON.stringify
+  }
 }
 
 class App {
@@ -421,7 +422,7 @@ class App {
 
     this.contactList = new ContactList(this);
     this.contactForm = new ContactForm(this);
-    this.appController = new Controller(this);
+    this.appController = new AppController(this);
     
     this.createHTML();
     this.populateHTML();
