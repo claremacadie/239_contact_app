@@ -32,13 +32,14 @@ export default class ContactForm {
   }
 
   createLabelHTML(labelText, inputName, inputType) {
-    let nameLabel = document.createElement('label');
-    nameLabel.textContent = labelText;
-    let nameInput = document.createElement('input');
-    nameInput.name = inputName;
-    nameInput.setAttribute('type', inputType);
-    nameLabel.append(nameInput);
-    return nameLabel;
+    let label = document.createElement('label');
+    label.textContent = labelText;
+    let input = document.createElement('input');
+    input.name = inputName;
+    input.setAttribute('type', inputType);
+    input.required = true;
+    label.append(input);
+    return label;
   }
 
   createTagsFieldsetHTML() {

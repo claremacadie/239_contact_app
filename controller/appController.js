@@ -46,19 +46,18 @@ export default class AppController {
     event.preventDefault();
     let data = this.extractData(new FormData(this.$addContactForm));
     console.log(data);
-    // try {
-    //   this.validateInputs(data);  
-    //   let dataToSend = this.formatDataToSend(data);
-    //   let response = await new FetchData(dataToSend); // create new class
-    //   // do something with response
-    // } catch(error) {
-    //   // do something with error
-    // }
+    try {
+      this.validateInputs(data);  
+      // let dataToSend = this.formatDataToSend(data);
+      // let response = await new FetchData(dataToSend); // create new class
+      // do something with response
+    } catch(error) {
+      // do something with error
+    }
   }
   
   handleCancelButton(event) {
     event.preventDefault();
-    // console.log('hi'); // Gets to here
     this.contactList.resetSearchCriteria();
     this.contactList.reloadContactList();
     this.app.displayContactList();
