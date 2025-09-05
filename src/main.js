@@ -368,6 +368,34 @@ class ContactList {
   }
 }
 
+class Controller {
+  constructor(app) {
+    this.app = app;
+    this.init();
+    this.bind();
+  }
+
+  init() {
+    this.contactForm = this.app.contactForm;
+    this.$addContactForm = this.contactForm.$form;
+    this.$cancelAddContactButton = this.contactForm.$cancelButton;
+
+    this.contactList = this.app.contactList;
+    this.$addContactButton = this.contactList.$addContactButton;
+    this.$searchInput = this.contactList.$searchInput;
+    this.$tagsFieldset = this.contactList.$tagsFieldset;
+  }
+
+  bind() {
+    this.$addContactForm.addEventListener('submit', this.contactForm.handleFormSubmit.bind(this.contactForm));
+    this.$cancelAddContactButton.addEventListener('click', this.contactForm.handleCancelButton.bind(this.contactForm));
+
+    this.$addContactButton.addEventListener('click', this.contactList.handleAddContact.bind(this.contactList));
+    this.$searchInput.addEventListener('input', this.contactList.handleSearch.bind(this.contactList));
+    this.$tagsFieldset.addEventListener('change', this.contactList.handleTagSelect.bind(this.contactList));
+  }
+}
+
 class App {
   constructor(url) {
     this.url = url;
@@ -378,25 +406,17 @@ class App {
     this.allContacts = await this.getAllContacts();
     this.tagOptions = this.getTagOptions();
     
-    this.contactList = new ContactList(this);
-    this.contactForm = new ContactForm(this);
-    
     this.$contactInterfaceDiv = document.getElementById("contact-interface");
     this.$contactFormDiv = document.getElementById('contact-form');
     this.$userMessage = document.getElementById("user-message");
     this.$errorMessage = document.getElementById("error-message");
+
+    this.contactList = new ContactList(this);
+    this.contactForm = new ContactForm(this);
+    this.appController = new Controller(this);
     
     this.createHTML();
     this.populateHTML();
-    this.bind();
-  }
-
-  bind() {
-    this.contactForm.$form.addEventListener('submit', this.contactForm.handleFormSubmit.bind(this.contactForm));
-    this.contactForm.$cancelButton.addEventListener('click', this.contactForm.handleCancelButton.bind(this.contactForm));
-    this.contactList.$addContactButton.addEventListener('click', this.contactList.handleAddContact.bind(this.contactList));
-    this.contactList.$searchInput.addEventListener('input', this.contactList.handleSearch.bind(this.contactList));
-    this.contactList.$tagsFieldset.addEventListener('change', this.contactList.handleTagSelect.bind(this.contactList));
   }
   
   createHTML() {
