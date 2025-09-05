@@ -334,35 +334,26 @@ class ContactList {
     }
   }
 
-  refreshContactList() {
-    this.filteredContacts = this.app.allContacts;
+  resetSearchCriteria() {
     this.searchCriteria = {'name': '', 'tags': []};
-    this.displayContacts();
   }
 
-  handleAddContact(event) {
-    event.preventDefault();
-    this.app.displayContactForm();
-  }
-
-  handleSearch(event) {
-    event.preventDefault();
-    
+  updateSearchTextCriteria() {
     let searchText = this.$searchInput.value.trim();
     this.searchCriteria['name'] = searchText;
-    this.filterContacts();
-    this.displayContacts();
   }
 
-  handleTagSelect(event) {
-    event.preventDefault();
-
+  updateTagSelectCriteria() {
     let selectedTags = [];
     [...this.$tagsFieldset.querySelectorAll('input')].forEach(checkbox => {
       if (checkbox.checked) selectedTags.push(checkbox.value);
     });
 
     this.searchCriteria['tags'] = selectedTags;
+  }
+
+  reloadContactList() {
+    this.filteredContacts = this.app.allContacts;
     this.filterContacts();
     this.displayContacts();
   }
@@ -390,9 +381,26 @@ class Controller {
     this.$addContactForm.addEventListener('submit', this.contactForm.handleFormSubmit.bind(this.contactForm));
     this.$cancelAddContactButton.addEventListener('click', this.contactForm.handleCancelButton.bind(this.contactForm));
 
-    this.$addContactButton.addEventListener('click', this.contactList.handleAddContact.bind(this.contactList));
-    this.$searchInput.addEventListener('input', this.contactList.handleSearch.bind(this.contactList));
-    this.$tagsFieldset.addEventListener('change', this.contactList.handleTagSelect.bind(this.contactList));
+    this.$addContactButton.addEventListener('click', this.handleAddContact.bind(this));
+    this.$searchInput.addEventListener('input', this.handleSearch.bind(this));
+    this.$tagsFieldset.addEventListener('change', this.handleTagSelect.bind(this));
+  }
+
+  handleAddContact(event) {
+    event.preventDefault();
+    this.app.displayContactForm();
+  }
+
+  handleSearch(event) {
+    event.preventDefault();
+    this.contactList.updateSearchTextCriteria();
+    this.contactList.reloadContactList();
+  }
+  
+  handleTagSelect(event) {
+    event.preventDefault();
+    this.contactList.updateTagSelectCriteria();
+    this.contactList.reloadContactList();
   }
 }
 
