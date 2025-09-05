@@ -13,9 +13,9 @@ export default class ContactForm {
   }
 
   createHTML() {
-    let nameLabel = this.createLabelHTML("Full name:", 'name', 'text');
+    let nameLabel = this.createLabelHTML("Full name:", 'full_name', 'text');
     let emailLabel = this.createLabelHTML("Email address:", 'email', 'email');
-    let phoneLabel = this.createLabelHTML("Telephone number:", 'phone', 'text');
+    let phoneLabel = this.createLabelHTML("Telephone number:", 'phone_number', 'text');
     let tagsFieldset = this.createTagsFieldsetHTML();
     let tagsLabel = this.createTagsLabelHTML();
     let submitButton = this.createSubmitButtonHTML();
@@ -37,7 +37,7 @@ export default class ContactForm {
     let input = document.createElement('input');
     input.name = inputName;
     input.setAttribute('type', inputType);
-    input.required = true;
+    if (inputName === 'full_name') input.required = true;
     label.append(input);
     return label;
   }

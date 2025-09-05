@@ -114,5 +114,7 @@ To do:
   - Cancel requests if another one comes in?
 
   - Which classes actually need the url?
+
+  - Think about when to clear user and error messages
 */
 

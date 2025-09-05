@@ -16,4 +16,22 @@ class ContactDBAPI {
       throw new Error(error);
     }
   }
+
+  async postNewContactData(data) {
+    let path = "/contacts";
+    let method = 'POST';
+    try {
+      let response = await fetch(this.url + path, {
+        'method': method,
+        'body': data,
+        'headers': {
+          'Content-Type': 'application/json',
+        }
+      });
+      if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+      
+    } catch(error) {
+      throw new Error(error);
+    }
+  }
 }

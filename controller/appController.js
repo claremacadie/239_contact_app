@@ -14,6 +14,8 @@ export default class AppController {
     this.$addContactButton = this.contactList.$addContactButton;
     this.$searchInput = this.contactList.$searchInput;
     this.$tagsFieldset = this.contactList.$tagsFieldset;
+
+    this.contactDBAPI = this.app.contactDBAPI;
   }
 
   bind() {
@@ -45,13 +47,14 @@ export default class AppController {
   async handleFormSubmit(event) {
     event.preventDefault();
     let data = this.extractData(new FormData(this.$addContactForm));
-    console.log(data);
     try {
       this.validateInputs(data);  
       let dataToSend = this.formatDataToSend(data);
       console.log(dataToSend)
-      // let response = await new FetchData(dataToSend); // create new class
-      // do something with response
+      let response = await this.contactDBAPI.postNewContactData(dataToSend);
+      console.log(response);
+      // user message to say contact was added - might be nice to have their name
+      // reload contacts list
     } catch(error) {
       console.log(error.message);
       this.app.$errorMessage.textContent = error.message;
@@ -92,9 +95,9 @@ export default class AppController {
     const phonePattern = /^(?=(?:.*\d){7,15}$)[+()\-.\s\d]+$/;
     const tagPattern = /^[A-Za-z]+$/;
 
-    if (!data.name.match(namePattern)) invalidEntries.push('Full name');
-    if (!data.email.match(emailPattern)) invalidEntries.push('Email');
-    if (!data.phone.match(phonePattern)) invalidEntries.push('Telephone number');
+    if (!data.full_name.match(namePattern)) invalidEntries.push('Full name');
+    if (data.email && !data.email.match(emailPattern)) invalidEntries.push('Email');
+    if (data.phone_number && !data.phone_number.match(phonePattern)) invalidEntries.push('Telephone number');
     if (!data.tags.every(tag => tag.match(tagPattern))) invalidEntries.push('Tag names');
 
     if (invalidEntries.length !== 0) {
