@@ -405,6 +405,36 @@ class AppController {
   }
 }
 
+class ContactDBAPI {
+  constructor(url, app) {
+    this.url = url;
+    this.app = app;
+    this.init();
+  }
+
+  init() {
+
+  }
+
+  async getAllContacts() {
+    // add try/catch
+    let contactsArr = await this.fetchContacts();
+    return contactsArr.map(contact => new Contact(contact));
+  }
+
+  async fetchContacts() {
+    let path = "/contacts";
+    try {
+      let response = await fetch(this.url + path);
+      if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+      let contacts = await response.json();
+      return contacts;
+    } catch(error) {
+      console.log(error)
+    }
+  }
+}
+
 class App {
   constructor(url) {
     this.url = url;
@@ -412,7 +442,8 @@ class App {
   }
   
   async init() {
-    this.allContacts = await this.getAllContacts();
+    this.contactDBAPI = new ContactDBAPI(this.url);
+    this.allContacts = await this.contactDBAPI.getAllContacts();
     this.tagOptions = this.getTagOptions();
     
     this.$contactInterfaceDiv = document.getElementById("contact-interface");
@@ -439,24 +470,6 @@ class App {
   
   populateHTML() {
     this.$contactFormDiv.classList.add('hidden');
-  }
-
-  async fetchContacts() {
-    let path = "/contacts";
-    try {
-      let response = await fetch(this.url + path);
-      if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-      let contacts = await response.json();
-      return contacts;
-    } catch(error) {
-      console.log(error)
-    }
-  }
-
-  async getAllContacts() {
-    // add try/catch
-    let contactsArr = await this.fetchContacts();
-    return contactsArr.map(contact => new Contact(contact));
   }
 
   getTagOptions() {
