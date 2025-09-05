@@ -58,8 +58,10 @@ export default class AppController {
   
   handleCancelButton(event) {
     event.preventDefault();
+    // console.log('hi'); // Gets to here
     this.contactList.resetSearchCriteria();
     this.contactList.reloadContactList();
+    this.app.displayContactList();
   }
 
   extractData(formData) {
