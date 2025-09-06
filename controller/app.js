@@ -117,6 +117,8 @@ To do:
       - use same form, if when submit button is pressed there is an id, then updating, otherwise, creating new
     - use different DBAPI as need to use method = PUT, path: contacts/:id
 
+  - rename addContactForm to contactForm
+
   - ensure submit button is not hidden when adding contact, and update button is hidden
 
   - greggy tag raising error, tagOptions is not being updated with new tags unless I refresh the page, I've now got two 'friend' and ' friend'

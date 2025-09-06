@@ -8,6 +8,7 @@ export default class AppController {
   init() {
     this.contactForm = this.app.contactForm;
     this.$addContactForm = this.contactForm.$form;
+    this.$updateContactButton = this.contactForm.$updateButton;
     this.$cancelAddContactButton = this.contactForm.$cancelButton;
 
     this.contactList = this.app.contactList;
@@ -22,6 +23,7 @@ export default class AppController {
   bind() {
     this.$addContactForm.addEventListener('submit', this.handleFormSubmit.bind(this));
     this.$cancelAddContactButton.addEventListener('click', this.handleCancelButton.bind(this));
+    this.$updateContactButton.addEventListener('click', this.handleUpdateContact.bind(this));
 
     this.$addContactButton.addEventListener('click', this.handleAddContact.bind(this));
     this.$searchInput.addEventListener('input', this.handleSearch.bind(this));
@@ -67,6 +69,24 @@ export default class AppController {
       let response = await this.contactDBAPI.postNewContactData(dataToSend);
       this.contactForm.$form.reset();
       this.app.$userMessage.textContent = `New contact added: ${response.full_name}`;
+      await this.app.resetContactListDisplay();
+    } catch(error) {
+      console.log(error.message);
+      this.app.$errorMessage.textContent = error.message;
+    }
+  }
+
+  async handleUpdateContact(event) {
+    event.preventDefault();
+    let target = event.target;
+    let contactId = target.dataset.contactId;
+    let data = this.extractData(new FormData(this.$addContactForm));
+    try {
+      this.validateInputs(data);  
+      let dataToSend = this.formatDataToSendWithId(data, contactId);
+      let response = await this.contactDBAPI.updateContactData(dataToSend, contactId);
+      this.contactForm.$form.reset();
+      this.app.$userMessage.textContent = `Contact updated: ${response.full_name}`;
       await this.app.resetContactListDisplay();
     } catch(error) {
       console.log(error.message);
@@ -123,6 +143,16 @@ export default class AppController {
     } else {
       data.tags = data.tags.join(', ');
     }
+    return JSON.stringify(data);
+  }
+
+  formatDataToSendWithId(data, contactId) {
+    if (data.tags.length === 0) {
+      delete data.tags;
+    } else {
+      data.tags = data.tags.join(', ');
+    }
+    data.id = contactId;
     return JSON.stringify(data);
   }
 
