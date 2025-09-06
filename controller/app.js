@@ -112,7 +112,20 @@ Classes:
   - HTMLTemplate?
 
 To do:
-  - Edit/Delete contact
+  - Delete contact
+    - Event listener 
+      - listen for all clicks in contactListDiv
+      - all Delete buttons need class of 'delete-contact'
+      - all Delete buttons to have data.contactId
+    - Event handler
+      - if target is a button with class of 'delete-contact'
+        - get contactId
+        - fetch request 
+          - to http://localhost:3000/api/contacts/:id 
+          - method DELETE
+          - handle error of contact not found
+
+  - Edit contact
     - Need to put id as data attribute somewhere in the Contact HTML
     - Beware using the same form for editing a contact because the `method` attribute is PUT, not POST
 
@@ -125,5 +138,7 @@ To do:
   - Which classes actually need the url?
 
   - Think about when to clear user and error messages
+
+  - Why do I get Fetch failed in the console when deleting a contact?
 */
 

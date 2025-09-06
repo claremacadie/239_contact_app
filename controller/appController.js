@@ -14,6 +14,7 @@ export default class AppController {
     this.$addContactButton = this.contactList.$addContactButton;
     this.$searchInput = this.contactList.$searchInput;
     this.$tagsFieldset = this.contactList.$tagsFieldset;
+    this.$contactListDiv = this.contactList.$listDiv;
 
     this.contactDBAPI = this.app.contactDBAPI;
   }
@@ -25,6 +26,33 @@ export default class AppController {
     this.$addContactButton.addEventListener('click', this.handleAddContact.bind(this));
     this.$searchInput.addEventListener('input', this.handleSearch.bind(this));
     this.$tagsFieldset.addEventListener('change', this.handleTagSelect.bind(this));
+
+    this.$contactListDiv.addEventListener('click', this.handleContactListClick.bind(this));
+  }
+
+  // - Delete contact
+  //   - Event listener 
+  //     - listen for all clicks in contactListDiv
+  //     - all Delete buttons need class of 'delete-contact'
+  //     - all Delete buttons to have data.contactId
+  //   - Event handler
+  //     - if target is a button with class of 'delete-contact'
+  //       - get contactId
+  //       - fetch request 
+  //         - to http://localhost:3000/api/contacts/:id 
+  //         - method DELETE
+  //         - handle error of contact not found
+
+  handleContactListClick(event) {
+    let target = event.target;
+
+    if (target.nodeName === 'BUTTON') {
+      console.log(target)
+      event.preventDefault();
+      let contactId = target.dataset.contactId;
+      if (target.classList.contains('edit-contact')) this.editContact(contactId);
+      if (target.classList.contains('delete-contact')) this.deleteContact(contactId);
+    }
   }
 
   handleAddContact(event) {
@@ -108,5 +136,21 @@ export default class AppController {
       data.tags = data.tags.join(', ');
     }
     return JSON.stringify(data);
+  }
+
+  editContact(contactId) {
+    console.log('edit');
+    console.log(contactId);
+  }
+
+  async deleteContact(contactId) {
+    let contactFullName = this.app.allContacts.find(contact => Number(contactId) === Number(contact.id)).full_name;
+    try {
+      let response = await this.contactDBAPI.deleteContact(contactId);
+      this.app.$userMessage.textContent = `${contactFullName} has been deleted.`
+      await this.app.resetContactListDisplay();
+    } catch(error) {
+      this.app.$errorMessage.textContent = `Delete failed: ${error.message}`;
+    }
   }
 }
