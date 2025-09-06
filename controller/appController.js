@@ -47,9 +47,8 @@ export default class AppController {
   async handleFormSubmit(event) {
     event.preventDefault();
     // debugging
-    console.log('SUBMIT', { defaultPrevented: e.defaultPrevented, target: e.target });
-  e.preventDefault();
-              !this.$contactFormDiv.classList.contains('hidden'));
+    // console.log('SUBMIT', { defaultPrevented: event.defaultPrevented, target: event.target });
+
     let data = this.extractData(new FormData(this.$addContactForm));
     try {
       this.validateInputs(data);  
@@ -58,12 +57,8 @@ export default class AppController {
       let response = await this.contactDBAPI.postNewContactData(dataToSend);
       console.log(response);
       // user message to say contact was added - might be nice to have their name
-      // reload contacts list
-      // weirdly it seems to be reloading the contacts list automatically
-      // also when it redisplays, if there are no tags for a new contact, None is not displayed, actually, the tags don't seem to be being displayed for new contacts unless I refresh
-
-      // debugging
-      console.log('AFTER FETCH, still on form? ', 
+      this.app.$userMessage.textContent = `New contact added: ${response.full_name}`;
+      this.app.displayContactList();
     } catch(error) {
       console.log(error.message);
       this.app.$errorMessage.textContent = error.message;
