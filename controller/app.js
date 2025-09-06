@@ -96,13 +96,6 @@ export default class App {
 }
 
 /*
-Contact list:
-  - edit: navigate to form
-  - delete: alert are you sure you want to delete the contact? Ok, Cancel
-
-Edit Contact Form:
-  - as above, but with fields filled in
-
 To do:
   - Edit contact event handler:
     - display contact form with fields filled in
