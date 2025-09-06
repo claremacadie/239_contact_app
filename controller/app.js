@@ -118,12 +118,15 @@ export default class App {
 
 /*
 To do:
-  - When should data be fetched? What if other people are adding contacts?
-    - Use setInterval to call every minute?
-    - Reset tagOptions when contacts refetched
+  - Add there are no contacts to display when filtering removes everything!
+  - Add loading indicators when fetch requests are happening
+
+  - In app.js, setInterval to: 
+    - fetch allContacts
+    - reset tagOptions
+    - update tag checkboxes in contactList
+    - update tag checkboxes in contactForm
 
   - Use debounce to cancel requests if another one comes in?
-
-  - Why do I get Fetch failed in the console when deleting a contact?
 */
 
