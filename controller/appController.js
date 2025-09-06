@@ -146,11 +146,11 @@ export default class AppController {
   async deleteContact(contactId) {
     let contactFullName = this.app.allContacts.find(contact => Number(contactId) === Number(contact.id)).full_name;
     try {
-      let response = await this.contactDBAPI.deleteContact(contactId);
+      await this.contactDBAPI.deleteContact(contactId);
       this.app.$userMessage.textContent = `${contactFullName} has been deleted.`
       await this.app.resetContactListDisplay();
     } catch(error) {
-      this.app.$errorMessage.textContent = `Delete failed: ${error.message}`;
+      this.app.$errorMessage.textContent = `Delete failed for contact id = ${contactId}: ${error.message}`;
     }
   }
 }

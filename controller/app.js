@@ -89,6 +89,7 @@ export default class App {
       this.$errorMessage.textContent = `Please refresh the page, there has been an error: ${error.message}`;
     }
     this.contactList.resetSearchCriteria();
+    this.contactList.populateTagsFieldset();
     this.contactList.reloadContactList();
     this.displayContactList();
   }
@@ -112,18 +113,8 @@ Classes:
   - HTMLTemplate?
 
 To do:
-  - Delete contact
-    - Event listener 
-      - listen for all clicks in contactListDiv
-      - all Delete buttons need class of 'delete-contact'
-      - all Delete buttons to have data.contactId
-    - Event handler
-      - if target is a button with class of 'delete-contact'
-        - get contactId
-        - fetch request 
-          - to http://localhost:3000/api/contacts/:id 
-          - method DELETE
-          - handle error of contact not found
+  - display tag checkboxes alphabetically
+  - Add are you sure you want to delete?
 
   - Edit contact
     - Need to put id as data attribute somewhere in the Contact HTML
