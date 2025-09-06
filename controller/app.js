@@ -110,21 +110,19 @@ export default class App {
 
 /*
 To do:
-  - rename addContactForm to contactForm
-
   - greggy tag raising error, tagOptions is not being updated with new tags unless I refresh the page, I've now got two 'friend' and ' friend'
 
   - should the list of contacts be a class with getContactById as a method?
 
   - check tags are lowercased and trimmed to prevent duplicates - I saw `greggy` and ` greggy`
 
+  - Think about when to clear user and error messages
+
   - When should data be fetched? What if other people are adding contacts?
     - Use setInterval to call every minute?
     - Reset tagOptions when contacts refetched
 
   - Use debounce to cancel requests if another one comes in?
-
-  - Think about when to clear user and error messages
 
   - Why do I get Fetch failed in the console when deleting a contact?
 */

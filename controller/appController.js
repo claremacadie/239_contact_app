@@ -7,7 +7,7 @@ export default class AppController {
 
   init() {
     this.contactForm = this.app.contactForm;
-    this.$addContactForm = this.contactForm.$form;
+    this.$form = this.contactForm.$form;
     this.$updateContactButton = this.contactForm.$updateButton;
     this.$cancelAddContactButton = this.contactForm.$cancelButton;
 
@@ -21,7 +21,7 @@ export default class AppController {
   }
 
   bind() {
-    this.$addContactForm.addEventListener('submit', this.handleFormSubmit.bind(this));
+    this.$form.addEventListener('submit', this.handleFormSubmit.bind(this));
     this.$cancelAddContactButton.addEventListener('click', this.handleCancelButton.bind(this));
     this.$updateContactButton.addEventListener('click', this.handleUpdateContact.bind(this));
 
@@ -62,7 +62,7 @@ export default class AppController {
   
   async handleFormSubmit(event) {
     event.preventDefault();
-    let data = this.extractData(new FormData(this.$addContactForm));
+    let data = this.extractData(new FormData(this.$form));
     try {
       this.validateInputs(data);  
       let dataToSend = this.formatDataToSend(data);
@@ -80,7 +80,7 @@ export default class AppController {
     event.preventDefault();
     let target = event.target;
     let contactId = target.dataset.contactId;
-    let data = this.extractData(new FormData(this.$addContactForm));
+    let data = this.extractData(new FormData(this.$form));
     try {
       this.validateInputs(data);  
       let dataToSend = this.formatDataToSendWithId(data, contactId);
