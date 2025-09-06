@@ -108,12 +108,10 @@ export default class AppController {
     let selectedTags = formData.getAll('selected-tags');
     let newTags = data['new-tags']
                   .split(',')
-                  .map(tag => tag.trim().toLowerCase());
-    console.log(`newTags: ${newTags}`);
-    // .filter(tag => tag);
-    
+                  .map(tag => tag.trim().toLowerCase())
+                  .filter(tag => tag); // this removes empty strings
+
     let allTags = [...new Set(selectedTags.concat(newTags))];
-    console.log(`allTags: ${allTags}`);
 
     data['tags'] = allTags;
     delete data['selected-tags'];
@@ -132,7 +130,7 @@ export default class AppController {
     if (!data.full_name.match(namePattern)) invalidEntries.push('Full name');
     if (data.email && !data.email.match(emailPattern)) invalidEntries.push('Email');
     if (data.phone_number && !data.phone_number.match(phonePattern)) invalidEntries.push('Telephone number');
-    if (!data.tags.every(tag => tag.match(tagPattern))) invalidEntries.push('Tag names');
+    if (data.tags.length !== 0 && !data.tags.every(tag => tag.match(tagPattern))) invalidEntries.push('Tag names');
 
     if (invalidEntries.length !== 0) {
       throw new Error(`These fields have invalid values: ${invalidEntries.join(', ')}`);
@@ -141,7 +139,7 @@ export default class AppController {
 
   formatDataToSend(data) {
     if (data.tags.length === 0) {
-      delete data.tags;
+      data['tags'] = null;
     } else {
       data.tags = data.tags.join(',');
     }
@@ -150,7 +148,7 @@ export default class AppController {
 
   formatDataToSendWithId(data, contactId) {
     if (data.tags.length === 0) {
-      delete data.tags;
+      data['tags'] = null;
     } else {
       data.tags = data.tags.join(',');
     }

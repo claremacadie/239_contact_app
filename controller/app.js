@@ -112,9 +112,6 @@ export default class App {
 
 /*
 To do:
-  - if I remove all tags and update, get an error
-  - should the list of contacts be a class with getContactById as a method?
-
   - Think about when to clear user and error messages
 
   - When should data be fetched? What if other people are adding contacts?
