@@ -46,17 +46,11 @@ export default class AppController {
   
   async handleFormSubmit(event) {
     event.preventDefault();
-    // debugging
-    // console.log('SUBMIT', { defaultPrevented: event.defaultPrevented, target: event.target });
-
     let data = this.extractData(new FormData(this.$addContactForm));
     try {
       this.validateInputs(data);  
       let dataToSend = this.formatDataToSend(data);
-      console.log(dataToSend)
       let response = await this.contactDBAPI.postNewContactData(dataToSend);
-      console.log(response);
-      // user message to say contact was added - might be nice to have their name
       this.app.$userMessage.textContent = `New contact added: ${response.full_name}`;
       this.app.displayContactList();
     } catch(error) {

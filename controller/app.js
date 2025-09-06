@@ -36,7 +36,8 @@ export default class App {
   async getAllContacts() {
     try {
       let contactsArr = await this.contactDBAPI.fetchContacts();
-      return contactsArr.map(contact => new Contact(contact));
+      return contactsArr.map(contact => new Contact(contact))
+        .sort((contactA, contactB) => contactA.full_name < contactB.full_name);
     } catch(error) {
       throw new Error(error);
     }
@@ -81,11 +82,6 @@ Contact list:
   - delete: alert are you sure you want to delete the contact? Ok, Cancel
   - use debounce to prevent overwhelm
 
-Alternative view:
-  Create Contact Form:
-    - ensure valid inputs
-    - ensure unique name, email and telephone
-
 Edit Contact Form:
   - as above, but with fields filled in
 
@@ -99,9 +95,6 @@ Classes:
   - HTMLTemplate?
 
 To do:
-- Create add Contact functionality
-    - fetch(send) data, error handling
-
   - Edit/Delete contact
     - Need to put id as data attribute somewhere in the Contact HTML
     - Beware using the same form for editing a contact because the `method` attribute is PUT, not POST

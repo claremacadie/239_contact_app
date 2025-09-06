@@ -1,9 +1,9 @@
 export default class Contact {
     constructor(obj) {
       this.id = obj['id'];
-      this.name = obj['full_name'];
+      this.full_name = obj['full_name'];
       this.email = obj['email'];
-      this.phone = obj['phone-number'];
+      this.phone_number = obj['phone_number'];
       this.tags = obj['tags'] === null ? [] : obj['tags'].split(',');
   
       this.init();
@@ -69,8 +69,8 @@ export default class Contact {
     
     populateHTML() {
       this.$li.dataset['contactId'] = this.id;
-      this.$nameH3.textContent = this.name;
-      this.$phoneDiv.querySelector('dd').textContent = this.phone || 'None';
+      this.$nameH3.textContent = this.full_name;
+      this.$phoneDiv.querySelector('dd').textContent = this.phone_number || 'None';
       this.$emailDiv.querySelector('dd').textContent = this.email || 'None';
       this.$tagsDiv.querySelector('dd').textContent = this.tags.length === 0 ? 'None' : this.tags.join(', ');
     }

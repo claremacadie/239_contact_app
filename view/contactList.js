@@ -6,7 +6,7 @@ export default class ContactList {
 
   init() {
       this.filteredContacts = this.app.allContacts;
-      this.searchCriteria = {'name': '', 'tags': []};
+      this.searchCriteria = {'full_name': '', 'tags': []};
 
       this.$buttonDiv = document.createElement('div');
       this.$addContactButton = document.createElement('button');
@@ -63,7 +63,7 @@ export default class ContactList {
   }
 
   filterContacts() {
-      if (this.searchCriteria['name'] === '') {
+      if (this.searchCriteria['full_name'] === '') {
       this.filteredContacts = this.app.allContacts;
       } else {
       this.filteredContacts = this.app.allContacts.filter(contactObj => contactObj.matchName(this.searchCriteria['name']));
@@ -77,12 +77,12 @@ export default class ContactList {
   }
 
   resetSearchCriteria() {
-      this.searchCriteria = {'name': '', 'tags': []};
+      this.searchCriteria = {'full_name': '', 'tags': []};
   }
 
   updateSearchTextCriteria() {
       let searchText = this.$searchInput.value.trim();
-      this.searchCriteria['name'] = searchText;
+      this.searchCriteria['full_name'] = searchText;
   }
 
   updateTagSelectCriteria() {
