@@ -43,7 +43,7 @@ export default class AppController {
 
   handleAddContact(event) {
     event.preventDefault();
-    this.app.displayContactForm();
+    this.app.displayAddContactForm();
   }
 
   handleSearch(event) {

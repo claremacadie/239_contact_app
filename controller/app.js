@@ -75,14 +75,15 @@ export default class App {
     }, []).sort();
   }
 
-  displayContactForm() {
-    this.$contactInterfaceDiv.classList.add('hidden');
-    this.$contactFormDiv.classList.remove('hidden');
-  }
-
   displayContactList() {
     this.$contactFormDiv.classList.add('hidden');
     this.$contactInterfaceDiv.classList.remove('hidden');
+  }
+
+  displayAddContactForm() {
+    this.$contactInterfaceDiv.classList.add('hidden');
+    this.$contactFormDiv.classList.remove('hidden');
+    this.contactForm.setFormToAddContact();
   }
 
   displayEditContactForm(contactId) {
