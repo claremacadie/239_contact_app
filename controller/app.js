@@ -95,6 +95,8 @@ Classes:
   - HTMLTemplate?
 
 To do:
+  - Why am I not getting None for Tags for new contacts?
+
   - Edit/Delete contact
     - Need to put id as data attribute somewhere in the Contact HTML
     - Beware using the same form for editing a contact because the `method` attribute is PUT, not POST
