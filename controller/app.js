@@ -118,15 +118,12 @@ To do:
 
   - When should data be fetched? What if other people are adding contacts?
     - Use setInterval to call every minute?
-  - When should tagOptions be fetched? Especially for add contact form.
-    - Every time data is fetched?
-  - Use debounce?
-  - Cancel requests if another one comes in?
+    - Reset tagOptions when contacts refetched
+
+  - Use debounce to cancel requests if another one comes in?
 
   - Which classes actually need the url?
 
   - Think about when to clear user and error messages
-
-  - It would be nice for contacts to be listed alphabetically
 */
 
