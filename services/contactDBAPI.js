@@ -29,7 +29,7 @@ class ContactDBAPI {
         }
       });
       if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-      
+      return await response.json();
     } catch(error) {
       throw new Error(error);
     }

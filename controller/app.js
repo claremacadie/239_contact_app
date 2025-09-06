@@ -116,5 +116,7 @@ To do:
   - Which classes actually need the url?
 
   - Think about when to clear user and error messages
+
+  - It would be nice for contacts to be listed alphabetically
 */
 
