@@ -157,7 +157,7 @@ export default class AppController {
   }
 
   async deleteContact(contactId) {
-    let contactFullName = this.app.allContacts.find(contact => Number(contactId) === Number(contact.id)).full_name;
+    let contactFullName = this.app.getContactById(contactId).full_name;
 
     if (!confirm(`Are you sure you want to delete: ${contactFullName}`)) return;
     try {
