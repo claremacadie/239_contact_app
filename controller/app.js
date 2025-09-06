@@ -76,11 +76,14 @@ export default class App {
   }
 
   displayContactList() {
+    this.$errorMessage.textContent = '';
     this.$contactFormDiv.classList.add('hidden');
     this.$contactInterfaceDiv.classList.remove('hidden');
   }
 
   displayAddContactForm() {
+    this.$userMessage.textContent = '';
+    this.$errorMessage.textContent = '';
     this.$contactInterfaceDiv.classList.add('hidden');
     this.$contactFormDiv.classList.remove('hidden');
     this.contactForm.populateTagsFieldsetHTML();
@@ -88,15 +91,18 @@ export default class App {
   }
   
   displayEditContactForm(contactId) {
+    this.$userMessage.textContent = '';
+    this.$errorMessage.textContent = '';
     this.$contactInterfaceDiv.classList.add('hidden');
     this.$contactFormDiv.classList.remove('hidden');
     this.contactForm.populateTagsFieldsetHTML();
-
+    
     let contact = this.getContactById(contactId);
     this.contactForm.setFormToEditContact(contact);
   }
-
+  
   async resetContactListDisplay() {
+    this.$errorMessage.textContent = '';
     try {
       this.allContacts = await this.getAllContacts();
       this.tagOptions = this.getTagOptions();
@@ -112,8 +118,6 @@ export default class App {
 
 /*
 To do:
-  - Think about when to clear user and error messages
-
   - When should data be fetched? What if other people are adding contacts?
     - Use setInterval to call every minute?
     - Reset tagOptions when contacts refetched
