@@ -103,29 +103,19 @@ Contact list:
 Edit Contact Form:
   - as above, but with fields filled in
 
-Classes:
-  - App
-  - AppController
-  - ContactDBAPI
-  - Contact
-  - ContactList
-  - ContactForm
-  - HTMLTemplate?
-
 To do:
-  - Add contact form needs resetting after submitting new contact
-
-  - Edit contact
-    - Need to put id as data attribute somewhere in the Contact HTML
-    - Beware using the same form for editing a contact because the `method` attribute is PUT, not POST
+  - Edit contact event handler:
+    - display contact form with fields filled in
+    - form needs contactId somewhere
+    - very similar to creating, but dataToSend has additional key of id
+      - use same form, if when submit button is pressed there is an id, then updating, otherwise, creating new
+    - use different DBAPI as need to use method = PUT, path: contacts/:id
 
   - When should data be fetched? What if other people are adding contacts?
     - Use setInterval to call every minute?
     - Reset tagOptions when contacts refetched
 
   - Use debounce to cancel requests if another one comes in?
-
-  - Which classes actually need the url?
 
   - Think about when to clear user and error messages
 

@@ -30,24 +30,10 @@ export default class AppController {
     this.$contactListDiv.addEventListener('click', this.handleContactListClick.bind(this));
   }
 
-  // - Delete contact
-  //   - Event listener 
-  //     - listen for all clicks in contactListDiv
-  //     - all Delete buttons need class of 'delete-contact'
-  //     - all Delete buttons to have data.contactId
-  //   - Event handler
-  //     - if target is a button with class of 'delete-contact'
-  //       - get contactId
-  //       - fetch request 
-  //         - to http://localhost:3000/api/contacts/:id 
-  //         - method DELETE
-  //         - handle error of contact not found
-
   handleContactListClick(event) {
     let target = event.target;
 
     if (target.nodeName === 'BUTTON') {
-      console.log(target)
       event.preventDefault();
       let contactId = target.dataset.contactId;
       if (target.classList.contains('edit-contact')) this.editContact(contactId);
@@ -79,6 +65,7 @@ export default class AppController {
       this.validateInputs(data);  
       let dataToSend = this.formatDataToSend(data);
       let response = await this.contactDBAPI.postNewContactData(dataToSend);
+      this.contactForm.$form.reset();
       this.app.$userMessage.textContent = `New contact added: ${response.full_name}`;
       await this.app.resetContactListDisplay();
     } catch(error) {
@@ -89,6 +76,7 @@ export default class AppController {
   
   async handleCancelButton(event) {
     event.preventDefault();
+    this.contactForm.$form.reset();
     await this.app.resetContactListDisplay();
   }
 
