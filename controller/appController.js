@@ -36,7 +36,7 @@ export default class AppController {
     if (target.nodeName === 'BUTTON') {
       event.preventDefault();
       let contactId = target.dataset.contactId;
-      if (target.classList.contains('edit-contact')) this.editContact(contactId);
+      if (target.classList.contains('edit-contact')) this.app.displayEditContactForm(contactId);
       if (target.classList.contains('delete-contact')) this.deleteContact(contactId);
     }
   }
@@ -124,11 +124,6 @@ export default class AppController {
       data.tags = data.tags.join(', ');
     }
     return JSON.stringify(data);
-  }
-
-  editContact(contactId) {
-    console.log('edit');
-    console.log(contactId);
   }
 
   async deleteContact(contactId) {

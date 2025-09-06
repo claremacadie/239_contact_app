@@ -48,6 +48,10 @@ export default class App {
       throw new Error(error);
     }
   }
+
+  getContactById(id) {
+    return this.allContacts.find(contact => Number(id) === Number(contact.id))
+  }
   
   createHTML() {
     this.$contactInterfaceDiv.append(
@@ -81,6 +85,14 @@ export default class App {
     this.$contactInterfaceDiv.classList.remove('hidden');
   }
 
+  displayEditContactForm(contactId) {
+    this.$contactInterfaceDiv.classList.add('hidden');
+    this.$contactFormDiv.classList.remove('hidden');
+
+    let contact = this.getContactById(contactId);
+    this.contactForm.setFormToEditContact(contact);
+  }
+
   async resetContactListDisplay() {
     try {
       this.allContacts = await this.getAllContacts();
@@ -103,6 +115,16 @@ To do:
     - very similar to creating, but dataToSend has additional key of id
       - use same form, if when submit button is pressed there is an id, then updating, otherwise, creating new
     - use different DBAPI as need to use method = PUT, path: contacts/:id
+
+  - ensure submit button is not hidden when adding contact, and update button is hidden
+
+  - greggy tag raising error, tagOptions is not being updated with new tags unless I refresh the page
+
+  - update deleting contact to use this.app.getContactById()
+
+  - should the list of contacts be a class with getContactById as a method?
+
+  - check tags are lowercased and trimmed to prevent duplicates - I saw `greggy` and ` greggy`
 
   - When should data be fetched? What if other people are adding contacts?
     - Use setInterval to call every minute?
