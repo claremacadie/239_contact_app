@@ -108,10 +108,12 @@ export default class AppController {
     let selectedTags = formData.getAll('selected-tags');
     let newTags = data['new-tags']
                   .split(',')
-                  .map(tag => tag.trim().toLowerCase())
-                  .filter(tag => tag);
+                  .map(tag => tag.trim().toLowerCase());
+    console.log(`newTags: ${newTags}`);
+    // .filter(tag => tag);
     
-    let allTags = [... new Set(selectedTags.concat(newTags))];
+    let allTags = [...new Set(selectedTags.concat(newTags))];
+    console.log(`allTags: ${allTags}`);
 
     data['tags'] = allTags;
     delete data['selected-tags'];
@@ -141,7 +143,7 @@ export default class AppController {
     if (data.tags.length === 0) {
       delete data.tags;
     } else {
-      data.tags = data.tags.join(', ');
+      data.tags = data.tags.join(',');
     }
     return JSON.stringify(data);
   }
@@ -150,7 +152,7 @@ export default class AppController {
     if (data.tags.length === 0) {
       delete data.tags;
     } else {
-      data.tags = data.tags.join(', ');
+      data.tags = data.tags.join(',');
     }
     data.id = contactId;
     return JSON.stringify(data);

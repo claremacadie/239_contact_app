@@ -83,12 +83,14 @@ export default class App {
   displayAddContactForm() {
     this.$contactInterfaceDiv.classList.add('hidden');
     this.$contactFormDiv.classList.remove('hidden');
+    this.contactForm.populateTagsFieldsetHTML();
     this.contactForm.setFormToAddContact();
   }
-
+  
   displayEditContactForm(contactId) {
     this.$contactInterfaceDiv.classList.add('hidden');
     this.$contactFormDiv.classList.remove('hidden');
+    this.contactForm.populateTagsFieldsetHTML();
 
     let contact = this.getContactById(contactId);
     this.contactForm.setFormToEditContact(contact);
@@ -110,11 +112,8 @@ export default class App {
 
 /*
 To do:
-  - greggy tag raising error, tagOptions is not being updated with new tags unless I refresh the page, I've now got two 'friend' and ' friend'
-
+  - if I remove all tags and update, get an error
   - should the list of contacts be a class with getContactById as a method?
-
-  - check tags are lowercased and trimmed to prevent duplicates - I saw `greggy` and ` greggy`
 
   - Think about when to clear user and error messages
 
