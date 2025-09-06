@@ -36,8 +36,14 @@ export default class App {
   async getAllContacts() {
     try {
       let contactsArr = await this.contactDBAPI.fetchContacts();
-      return contactsArr.map(contact => new Contact(contact))
-        .sort((contactA, contactB) => contactA.full_name < contactB.full_name);
+      return contactsArr
+        .map(contact => new Contact(contact))
+        .sort((a, b) => {
+          if (a.full_name.toLowerCase() < b.full_name.toLowerCase()) return -1;
+          if (a.full_name.toLowerCase() > b.full_name.toLowerCase()) return 1;
+          return 0;
+        }
+      );
     } catch(error) {
       throw new Error(error);
     }
