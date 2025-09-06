@@ -113,8 +113,7 @@ Classes:
   - HTMLTemplate?
 
 To do:
-  - display tag checkboxes alphabetically
-  - Add are you sure you want to delete?
+  - Add contact form needs resetting after submitting new contact
 
   - Edit contact
     - Need to put id as data attribute somewhere in the Contact HTML
