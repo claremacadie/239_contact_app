@@ -52,18 +52,16 @@ export default class AppController {
       let dataToSend = this.formatDataToSend(data);
       let response = await this.contactDBAPI.postNewContactData(dataToSend);
       this.app.$userMessage.textContent = `New contact added: ${response.full_name}`;
-      this.app.displayContactList();
+      await this.app.resetContactListDisplay();
     } catch(error) {
       console.log(error.message);
       this.app.$errorMessage.textContent = error.message;
     }
   }
   
-  handleCancelButton(event) {
+  async handleCancelButton(event) {
     event.preventDefault();
-    this.contactList.resetSearchCriteria();
-    this.contactList.reloadContactList();
-    this.app.displayContactList();
+    await this.app.resetContactListDisplay();
   }
 
   extractData(formData) {
@@ -104,7 +102,11 @@ export default class AppController {
   }
 
   formatDataToSend(data) {
-    data.tags = data.tags.join(', ');
+    if (data.tags.length === 0) {
+      delete data.tags;
+    } else {
+      data.tags = data.tags.join(', ');
+    }
     return JSON.stringify(data);
   }
 }

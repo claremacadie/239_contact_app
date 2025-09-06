@@ -74,13 +74,24 @@ export default class App {
     this.$contactFormDiv.classList.add('hidden');
     this.$contactInterfaceDiv.classList.remove('hidden');
   }
+
+  async resetContactListDisplay() {
+    try {
+      this.allContacts = await this.getAllContacts();
+      this.tagOptions = this.getTagOptions();
+    } catch(error) {
+      this.$errorMessage.textContent = `Please refresh the page, there has been an error: ${error.message}`;
+    }
+    this.contactList.resetSearchCriteria();
+    this.contactList.reloadContactList();
+    this.displayContactList();
+  }
 }
 
 /*
 Contact list:
   - edit: navigate to form
   - delete: alert are you sure you want to delete the contact? Ok, Cancel
-  - use debounce to prevent overwhelm
 
 Edit Contact Form:
   - as above, but with fields filled in
@@ -95,8 +106,6 @@ Classes:
   - HTMLTemplate?
 
 To do:
-  - Why am I not getting None for Tags for new contacts?
-
   - Edit/Delete contact
     - Need to put id as data attribute somewhere in the Contact HTML
     - Beware using the same form for editing a contact because the `method` attribute is PUT, not POST
