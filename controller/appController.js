@@ -1,3 +1,6 @@
+import HttpError from '../utils/httpError.js';
+import ValidationError from '../utils/validationError.js';
+
 export default class AppController {
   constructor(app) {
     this.app = app;
@@ -74,8 +77,13 @@ export default class AppController {
       this.app.displayUserMessage(`New contact added: ${response.full_name}`);
       await this.app.resetContactListDisplay();
     } catch(error) {
+      // Filter the error type to figure out whether to console.log (e.g. method doesn't exist) or display to user (e.g. input fields are wrong)
+      if (error instanceof ValidationError) {
+        this.app.displayErrorMessage(error.message);
+        return;
+      }
       console.log(error.message);
-      this.app.displayErrorMessage(error.message);
+      this.app.displayErrorMessage('Something went wrong. Please try again.');
     }
   }
 
@@ -141,18 +149,18 @@ export default class AppController {
   #validateInputs(data) {
     let invalidEntries = [];
 
-    const namePattern = /^(?=.{2,50}$)[A-Za-z][A-Za-z .'-]*[A-Za-z]$/;
-    const emailPattern = /^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}$/i;
-    const phonePattern = /^(?=(?:.*\d){7,15}$)[+()\-.\s\d]+$/;
-    const tagPattern = /^[A-Za-z]+$/;
+    const nameRgx = /^(?=.{2,50}$)[A-Za-z][A-Za-z .'-]*[A-Za-z]$/;
+    const emailRgx = /^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}$/i;
+    const phoneRgx = /^(?=(?:.*\d){7,15}$)[+()\-.\s\d]+$/;
+    const tagRgx = /^[A-Za-z]+$/;
 
-    if (!data.full_name.match(namePattern)) invalidEntries.push('Full name');
-    if (data.email && !data.email.match(emailPattern)) invalidEntries.push('Email');
-    if (data.phone_number && !data.phone_number.match(phonePattern)) invalidEntries.push('Telephone number');
-    if (data.tags.length !== 0 && !data.tags.every(tag => tag.match(tagPattern))) invalidEntries.push('Tag names');
+    if (!data.full_name.match(nameRgx)) invalidEntries.push('Full name');
+    if (data.email && !data.email.match(emailRgx)) invalidEntries.push('Email');
+    if (data.phone_number && !data.phone_number.match(phoneRgx)) invalidEntries.push('Telephone number');
+    if (data.tags.length !== 0 && !data.tags.every(tag => tag.match(tagRgx))) invalidEntries.push('Tag names');
 
     if (invalidEntries.length !== 0) {
-      throw new Error(`These fields have invalid values: ${invalidEntries.join(', ')}`);
+      throw new ValidationError(`These fields have invalid values: ${invalidEntries.join(', ')}`, invalidEntries);
     }
   }
 

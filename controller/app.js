@@ -139,10 +139,6 @@ export default class App {
 
 /*
 To do:
-- Check refactoring
-
-- Consider extracting some of the longer methods like createHTML into smaller, more focused functions. For example, in ContactForm, you could break down the form creation into separate methods for each section.
-
 - Think about error handling outside of fetch - if there are errors in method names, this is displayed to the user. Create an AppError class?
 
 - create test framework
