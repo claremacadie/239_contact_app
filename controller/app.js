@@ -7,10 +7,10 @@ import AppController from './appController.js';
 export default class App {
   constructor(url) {
     this.url = url;
-    this.init();
+    this.#init();
   }
   
-  async init() {
+  async #init() {
     this.$contactInterfaceDiv = document.getElementById("contact-interface");
     this.$contactFormDiv = document.getElementById('contact-form');
     this.$userMessage = document.getElementById("user-message");
@@ -20,19 +20,37 @@ export default class App {
 
     try {
       this.allContacts = await this.getAllContacts();
-      this.tagOptions = this.getTagOptions();
+      this.tagOptions = this.#getTagOptions();
       
       this.contactList = new ContactList(this);
       this.contactForm = new ContactForm(this);
       this.appController = new AppController(this);
       
-      this.createHTML();
-      this.populateHTML();
+      this.#createHTML();
+      this.#configureHTML();
     } catch(error) {
       this.displayErrorMessage(`Please refresh the page, there has been an error: ${error.message}`);
     }
   }
 
+  // ---------- public API ----------
+  displayUserMessage(msg) {
+    this.$userMessage.textContent = msg;
+  }
+
+  displayErrorMessage(msg) {
+    this.$errorMessage.textContent = msg;
+  }
+
+  clearUserMessage() {
+    this.$userMessage.textContent = '';
+  }
+  
+  clearErrorMessage() {
+    this.$errorMessage.textContent = '';
+  }
+
+  // -- Contacts --
   async getAllContacts() {
     try {
       let contactsArr = await this.contactDBAPI.fetchContacts();
@@ -53,7 +71,50 @@ export default class App {
     return this.allContacts.find(contact => Number(id) === Number(contact.id))
   }
   
-  createHTML() {
+  // -- ContactList --
+  displayContactList() {
+    this.clearErrorMessage();
+    this.$contactFormDiv.classList.add('hidden');
+    this.$contactInterfaceDiv.classList.remove('hidden');
+  }
+
+  async resetContactListDisplay() {
+    this.clearErrorMessage();
+    try {
+      this.allContacts = await this.getAllContacts();
+      this.tagOptions = this.#getTagOptions();
+    } catch(error) {
+      this.displayErrorMessage(`Please refresh the page, there has been an error: ${error.message}`);
+    }
+    this.contactList.resetSearchCriteria();
+    this.contactList.renderTagsFieldset();
+    this.contactList.reloadContactList();
+    this.displayContactList();
+  }
+
+  // -- ContactForm --
+  displayAddContactForm() {
+    this.clearUserMessage();
+    this.clearErrorMessage();
+    this.$contactInterfaceDiv.classList.add('hidden');
+    this.$contactFormDiv.classList.remove('hidden');
+    this.contactForm.renderTagOptions();
+    this.contactForm.displayAddMode();
+  }
+  
+  displayEditContactForm(contactId) {
+    this.clearUserMessage();
+    this.clearErrorMessage();
+    this.$contactInterfaceDiv.classList.add('hidden');
+    this.$contactFormDiv.classList.remove('hidden');
+    this.contactForm.renderTagOptions();
+    
+    let contact = this.getContactById(contactId);
+    this.contactForm.displayEditMode(contact);
+  }
+
+  // ---------- private API ----------
+  #createHTML() {
     this.$contactInterfaceDiv.append(
       this.contactList.$buttonDiv, 
       this.contactList.$filterDiv, 
@@ -62,11 +123,11 @@ export default class App {
     this.$contactFormDiv.append(this.contactForm.$form);
   }
   
-  populateHTML() {
+  #configureHTML() {
     this.$contactFormDiv.classList.add('hidden');
   }
 
-  getTagOptions() {
+  #getTagOptions() {
     return this.allContacts.reduce((tagOptions, contact) => {
       contact.tags.forEach(tag => {
         if (!tagOptions.includes(tag)) tagOptions.push(tag);
@@ -74,70 +135,20 @@ export default class App {
       return tagOptions;
     }, []).sort();
   }
-
-  displayContactList() {
-    this.clearErrorMessage();
-    this.$contactFormDiv.classList.add('hidden');
-    this.$contactInterfaceDiv.classList.remove('hidden');
-  }
-
-  displayAddContactForm() {
-    this.clearUserMessage();
-    this.clearErrorMessage();
-    this.$contactInterfaceDiv.classList.add('hidden');
-    this.$contactFormDiv.classList.remove('hidden');
-    this.contactForm.populateTagsFieldsetHTML();
-    this.contactForm.setFormToAddContact();
-  }
-  
-  displayEditContactForm(contactId) {
-    this.clearUserMessage();
-    this.clearErrorMessage();
-    this.$contactInterfaceDiv.classList.add('hidden');
-    this.$contactFormDiv.classList.remove('hidden');
-    this.contactForm.populateTagsFieldsetHTML();
-    
-    let contact = this.getContactById(contactId);
-    this.contactForm.setFormToEditContact(contact);
-  }
-  
-  async resetContactListDisplay() {
-    this.clearErrorMessage();
-    try {
-      this.allContacts = await this.getAllContacts();
-      this.tagOptions = this.getTagOptions();
-    } catch(error) {
-      this.displayErrorMessage(`Please refresh the page, there has been an error: ${error.message}`);
-    }
-    this.contactList.resetSearchCriteria();
-    this.contactList.populateTagsFieldset();
-    this.contactList.reloadContactList();
-    this.displayContactList();
-  }
-
-  displayUserMessage(msg) {
-    this.$userMessage.textContent = msg;
-  }
-
-  displayErrorMessage(msg) {
-    this.$errorMessage.textContent = msg;
-  }
-
-  clearUserMessage() {
-    this.$userMessage.textContent = '';
-  }
-  
-  clearErrorMessage() {
-    this.$errorMessage.textContent = '';
-  }
 }
 
 /*
 To do:
-  - Add loading indicators when fetch requests are happening
-  - Consider extracting some of the longer methods like createHTML into smaller, more focused functions. For example, in ContactForm, you could break down the form creation into separate methods for each section.
-  - Create a generic fetch request function, with error handling
+- Check refactoring
 
+- Consider extracting some of the longer methods like createHTML into smaller, more focused functions. For example, in ContactForm, you could break down the form creation into separate methods for each section.
+
+- Think about error handling outside of fetch - if there are errors in method names, this is displayed to the user. Create an AppError class?
+
+- create test framework
+
+- Create a generic fetch request function, with error handling
+  - Add loading indicators when fetch requests are happening
   - Be more specific about which errors to catch and re-throw versus which ones to handle directly.
     - How might you distinguish between a network connectivity issue versus a "contact not found" error from your API server?
 

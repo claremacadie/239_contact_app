@@ -1,11 +1,11 @@
 export default class AppController {
   constructor(app) {
     this.app = app;
-    this.init();
-    this.bind();
+    this.#init();
+    this.#bind();
   }
 
-  init() {
+  #init() {
     this.contactForm = this.app.contactForm;
     this.$form = this.contactForm.$form;
     this.$updateContactButton = this.contactForm.$updateButton;
@@ -20,52 +20,55 @@ export default class AppController {
     this.contactDBAPI = this.app.contactDBAPI;
   }
 
-  bind() {
-    this.$form.addEventListener('submit', this.handleFormSubmit.bind(this));
-    this.$cancelAddContactButton.addEventListener('click', this.handleCancelButton.bind(this));
-    this.$updateContactButton.addEventListener('click', this.handleUpdateContact.bind(this));
+  #bind() {
+    this.$form.addEventListener('submit', this.#handleFormSubmit.bind(this));
+    this.$cancelAddContactButton.addEventListener('click', this.#handleCancelButton.bind(this));
+    this.$updateContactButton.addEventListener('click', this.#handleUpdateContact.bind(this));
 
-    this.$addContactButton.addEventListener('click', this.handleAddContact.bind(this));
-    this.$searchInput.addEventListener('input', this.handleSearch.bind(this));
-    this.$tagsFieldset.addEventListener('change', this.handleTagSelect.bind(this));
+    this.$addContactButton.addEventListener('click', this.#handleAddContact.bind(this));
+    this.$searchInput.addEventListener('input', this.#handleSearch.bind(this));
+    this.$tagsFieldset.addEventListener('change', this.#handleTagSelect.bind(this));
 
-    this.$contactListDiv.addEventListener('click', this.handleContactListClick.bind(this));
+    this.$contactListDiv.addEventListener('click', this.#handleContactListClick.bind(this));
   }
 
-  handleContactListClick(event) {
+  // ---------- handlers ----------
+  // -- ContactList --
+  #handleContactListClick(event) {
     let target = event.target;
 
     if (target.nodeName === 'BUTTON') {
       event.preventDefault();
       let contactId = target.dataset.contactId;
       if (target.classList.contains('edit-contact')) this.app.displayEditContactForm(contactId);
-      if (target.classList.contains('delete-contact')) this.deleteContact(contactId);
+      if (target.classList.contains('delete-contact')) this.#deleteContact(contactId);
     }
   }
 
-  handleAddContact(event) {
+  #handleAddContact(event) {
     event.preventDefault();
     this.app.displayAddContactForm();
   }
 
-  handleSearch(event) {
+  #handleSearch(event) {
     event.preventDefault();
     this.contactList.updateSearchTextCriteria();
     this.contactList.reloadContactList();
   }
   
-  handleTagSelect(event) {
+  #handleTagSelect(event) {
     event.preventDefault();
     this.contactList.updateTagSelectCriteria();
     this.contactList.reloadContactList();
   }
   
-  async handleFormSubmit(event) {
+  // -- ContactForm --
+  async #handleFormSubmit(event) {
     event.preventDefault();
-    let data = this.extractData(new FormData(this.$form));
+    let data = this.#extractData(new FormData(this.$form));
     try {
-      this.validateInputs(data);  
-      let dataToSend = this.formatDataToSend(data);
+      this.#validateInputs(data);  
+      let dataToSend = this.#formatDataToSend(data);
       let response = await this.contactDBAPI.postNewContactData(dataToSend);
       this.contactForm.$form.reset();
       this.app.displayUserMessage(`New contact added: ${response.full_name}`);
@@ -76,14 +79,14 @@ export default class AppController {
     }
   }
 
-  async handleUpdateContact(event) {
+  async #handleUpdateContact(event) {
     event.preventDefault();
     let target = event.target;
     let contactId = target.dataset.contactId;
-    let data = this.extractData(new FormData(this.$form));
+    let data = this.#extractData(new FormData(this.$form));
     try {
-      this.validateInputs(data);  
-      let dataToSend = this.formatDataToSendWithId(data, contactId);
+      this.#validateInputs(data);  
+      let dataToSend = this.#formatDataToSendWithId(data, contactId);
       let response = await this.contactDBAPI.updateContactData(dataToSend, contactId);
       this.contactForm.$form.reset();
       this.app.displayUserMessage(`Contact updated: ${response.full_name}`);
@@ -94,13 +97,29 @@ export default class AppController {
     }
   }
   
-  async handleCancelButton(event) {
+  async #handleCancelButton(event) {
     event.preventDefault();
     this.contactForm.$form.reset();
     await this.app.resetContactListDisplay();
   }
 
-  extractData(formData) {
+  // ---------- helpers ----------
+  // -- ContactList --
+  async #deleteContact(contactId) {
+    let contactFullName = this.app.getContactById(contactId).full_name;
+
+    if (!confirm(`Are you sure you want to delete: ${contactFullName}`)) return;
+    try {
+      await this.contactDBAPI.deleteContact(contactId);
+      this.app.displayUserMessage(`${contactFullName} has been deleted.`);
+      await this.app.resetContactListDisplay();
+    } catch(error) {
+      this.app.displayErrorMessage(`Delete failed for contact id = ${contactId}: ${error.message}`);
+    }
+  }
+
+  // -- ContactForm --
+  #extractData(formData) {
     let data = Object.fromEntries(formData.entries());
     for (let key in data) {
       data[key] = data[key].trim();
@@ -119,7 +138,7 @@ export default class AppController {
     return data;
   }
 
-  validateInputs(data) {
+  #validateInputs(data) {
     let invalidEntries = [];
 
     const namePattern = /^(?=.{2,50}$)[A-Za-z][A-Za-z .'-]*[A-Za-z]$/;
@@ -137,7 +156,7 @@ export default class AppController {
     }
   }
 
-  formatDataToSend(data) {
+  #formatDataToSend(data) {
     if (data.tags.length === 0) {
       data['tags'] = null;
     } else {
@@ -146,7 +165,7 @@ export default class AppController {
     return JSON.stringify(data);
   }
 
-  formatDataToSendWithId(data, contactId) {
+  #formatDataToSendWithId(data, contactId) {
     if (data.tags.length === 0) {
       data['tags'] = null;
     } else {
@@ -154,18 +173,5 @@ export default class AppController {
     }
     data.id = contactId;
     return JSON.stringify(data);
-  }
-
-  async deleteContact(contactId) {
-    let contactFullName = this.app.getContactById(contactId).full_name;
-
-    if (!confirm(`Are you sure you want to delete: ${contactFullName}`)) return;
-    try {
-      await this.contactDBAPI.deleteContact(contactId);
-      this.app.displayUserMessage(`${contactFullName} has been deleted.`);
-      await this.app.resetContactListDisplay();
-    } catch(error) {
-      this.app.displayErrorMessage(`Delete failed for contact id = ${contactId}: ${error.message}`);
-    }
   }
 }

@@ -1,43 +1,51 @@
 export default class ContactList {
   constructor(app) {
-      this.app = app;
-      this.init();
+    this.app = app;
+    this.#init();
   }
 
-  init() {
-      this.filteredContacts = this.app.allContacts;
-      this.searchCriteria = {'full_name': '', 'tags': []};
+  #init() {
+    this.filteredContacts = this.app.allContacts;
+    this.searchCriteria = {'full_name': '', 'tags': []};
 
-      this.$buttonDiv = document.createElement('div');
-      this.$addContactButton = document.createElement('button');
-      this.$filterDiv = document.createElement('div');
-      this.$searchInput = document.createElement('input');
-      this.$tagsFieldset = document.createElement('fieldset');
-      this.$listDiv = document.createElement("div");
+    this.$buttonDiv = document.createElement('div');
+    this.$addContactButton = document.createElement('button');
+    this.$filterDiv = document.createElement('div');
+    this.$searchInput = document.createElement('input');
+    this.$tagsFieldset = document.createElement('fieldset');
+    this.$listDiv = document.createElement("div");
 
-      this.createHTML();
-      this.populateHTML();
+    this.#createHTML();
+    this.#configureHTML();
   }
 
-  createHTML() {
-      this.$buttonDiv.append(this.$addContactButton);
-      this.$addContactButton.textContent = "Add Contact";
-      
-      this.$filterDiv.append( this.$searchInput, this.$tagsFieldset);
-
-      this.$searchInput.className = 'search';
-      this.$searchInput.setAttribute('type', 'text');
-      this.$searchInput.setAttribute('placeholder', 'Search');
-
-      this.$tagsFieldset.className = 'tags';
+  // ---------- public API ----------
+  resetSearchCriteria() {
+    this.searchCriteria = {'full_name': '', 'tags': []};
   }
 
-  populateHTML() {
-      this.populateTagsFieldset();
-      this.displayContacts();
+  updateSearchTextCriteria() {
+      let searchText = this.$searchInput.value.trim();
+      this.searchCriteria['full_name'] = searchText;
   }
 
-  populateTagsFieldset() {
+  updateTagSelectCriteria() {
+    let selectedTags = [];
+    let checkboxes = [...this.$tagsFieldset.querySelectorAll('input')];
+    checkboxes.forEach(checkbox => {
+      if (checkbox.checked) selectedTags.push(checkbox.value);
+    });
+
+    this.searchCriteria['tags'] = selectedTags;
+  }
+
+  reloadContactList() {
+    this.filteredContacts = this.app.allContacts;
+    this.#filterContacts();
+    this.#displayContacts();
+  }
+
+  renderTagsFieldset() {
     this.$tagsFieldset.innerHTML = '';
     let legend = document.createElement('legend');
     legend.textContent = 'Select tags:';
@@ -56,52 +64,48 @@ export default class ContactList {
     });
   }
 
-  displayContacts() {
-      this.$listDiv.innerHTML = '';
-      if (this.filteredContacts.length === 0) {
-        this.app.displayUserMessage('There are no contacts meeting those search criteria.');
-      } else {
-        this.filteredContacts.forEach(contact => {
-          this.$listDiv.append(contact.$li);
-        });
-      }
+  // ---------- private API ----------
+  #createHTML() {
+    this.$buttonDiv.append(this.$addContactButton);
+    this.$addContactButton.textContent = "Add Contact";
+    
+    this.$filterDiv.append( this.$searchInput, this.$tagsFieldset);
+
+    this.$searchInput.className = 'search';
+    this.$searchInput.setAttribute('type', 'text');
+    this.$searchInput.setAttribute('placeholder', 'Search');
+
+    this.$tagsFieldset.className = 'tags';
   }
 
-  filterContacts() {
-      if (this.searchCriteria['full_name'] === '') {
-      this.filteredContacts = this.app.allContacts;
-      } else {
-      this.filteredContacts = this.app.allContacts.filter(contactObj => contactObj.matchName(this.searchCriteria['full_name']));
-      }
-
-      if (this.searchCriteria['tags'].length === 0) {
-      return;
-      } else {
-      this.filteredContacts = this.filteredContacts.filter(contactObj => contactObj.matchTags(this.searchCriteria['tags']));
-      }
+  #configureHTML() {
+    this.renderTagsFieldset();
+    this.#displayContacts();
   }
 
-  resetSearchCriteria() {
-      this.searchCriteria = {'full_name': '', 'tags': []};
-  }
-
-  updateSearchTextCriteria() {
-      let searchText = this.$searchInput.value.trim();
-      this.searchCriteria['full_name'] = searchText;
-  }
-
-  updateTagSelectCriteria() {
-      let selectedTags = [];
-      [...this.$tagsFieldset.querySelectorAll('input')].forEach(checkbox => {
-      if (checkbox.checked) selectedTags.push(checkbox.value);
+  // ---------- helpers ----------
+  #displayContacts() {
+    this.$listDiv.innerHTML = '';
+    if (this.filteredContacts.length === 0) {
+      this.app.displayUserMessage('There are no contacts meeting those search criteria.');
+    } else {
+      this.filteredContacts.forEach(contact => {
+        this.$listDiv.append(contact.$li);
       });
-
-      this.searchCriteria['tags'] = selectedTags;
+    }
   }
 
-  reloadContactList() {
+  #filterContacts() {
+    if (this.searchCriteria['full_name'] === '') {
       this.filteredContacts = this.app.allContacts;
-      this.filterContacts();
-      this.displayContacts();
+    } else {
+      this.filteredContacts = this.app.allContacts.filter(contactObj => contactObj.matchName(this.searchCriteria['full_name']));
+    }
+
+    if (this.searchCriteria['tags'].length === 0) {
+      return;
+    } else {
+      this.filteredContacts = this.filteredContacts.filter(contactObj => contactObj.matchTags(this.searchCriteria['tags']));
+    }
   }
 }
