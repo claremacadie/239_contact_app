@@ -68,11 +68,11 @@ export default class AppController {
       let dataToSend = this.formatDataToSend(data);
       let response = await this.contactDBAPI.postNewContactData(dataToSend);
       this.contactForm.$form.reset();
-      this.app.$userMessage.textContent = `New contact added: ${response.full_name}`;
+      this.app.displayUserMessage(`New contact added: ${response.full_name}`);
       await this.app.resetContactListDisplay();
     } catch(error) {
       console.log(error.message);
-      this.app.$errorMessage.textContent = error.message;
+      this.app.displayErrorMessage(error.message);
     }
   }
 
@@ -86,11 +86,11 @@ export default class AppController {
       let dataToSend = this.formatDataToSendWithId(data, contactId);
       let response = await this.contactDBAPI.updateContactData(dataToSend, contactId);
       this.contactForm.$form.reset();
-      this.app.$userMessage.textContent = `Contact updated: ${response.full_name}`;
+      this.app.displayUserMessage(`Contact updated: ${response.full_name}`);
       await this.app.resetContactListDisplay();
     } catch(error) {
       console.log(error.message);
-      this.app.$errorMessage.textContent = error.message;
+      this.app.displayErrorMessage(error.message);
     }
   }
   
@@ -162,10 +162,10 @@ export default class AppController {
     if (!confirm(`Are you sure you want to delete: ${contactFullName}`)) return;
     try {
       await this.contactDBAPI.deleteContact(contactId);
-      this.app.$userMessage.textContent = `${contactFullName} has been deleted.`
+      this.app.displayUserMessage(`${contactFullName} has been deleted.`);
       await this.app.resetContactListDisplay();
     } catch(error) {
-      this.app.$errorMessage.textContent = `Delete failed for contact id = ${contactId}: ${error.message}`;
+      this.app.displayErrorMessage(`Delete failed for contact id = ${contactId}: ${error.message}`);
     }
   }
 }

@@ -29,7 +29,7 @@ export default class App {
       this.createHTML();
       this.populateHTML();
     } catch(error) {
-      this.$errorMessage.textContent = `Please refresh the page, there has been an error: ${error.message}`;
+      this.displayErrorMessage(`Please refresh the page, there has been an error: ${error.message}`);
     }
   }
 
@@ -76,14 +76,14 @@ export default class App {
   }
 
   displayContactList() {
-    this.$errorMessage.textContent = '';
+    this.clearErrorMessage();
     this.$contactFormDiv.classList.add('hidden');
     this.$contactInterfaceDiv.classList.remove('hidden');
   }
 
   displayAddContactForm() {
-    this.$userMessage.textContent = '';
-    this.$errorMessage.textContent = '';
+    this.clearUserMessage();
+    this.clearErrorMessage();
     this.$contactInterfaceDiv.classList.add('hidden');
     this.$contactFormDiv.classList.remove('hidden');
     this.contactForm.populateTagsFieldsetHTML();
@@ -91,8 +91,8 @@ export default class App {
   }
   
   displayEditContactForm(contactId) {
-    this.$userMessage.textContent = '';
-    this.$errorMessage.textContent = '';
+    this.clearUserMessage();
+    this.clearErrorMessage();
     this.$contactInterfaceDiv.classList.add('hidden');
     this.$contactFormDiv.classList.remove('hidden');
     this.contactForm.populateTagsFieldsetHTML();
@@ -102,17 +102,33 @@ export default class App {
   }
   
   async resetContactListDisplay() {
-    this.$errorMessage.textContent = '';
+    this.clearErrorMessage();
     try {
       this.allContacts = await this.getAllContacts();
       this.tagOptions = this.getTagOptions();
     } catch(error) {
-      this.$errorMessage.textContent = `Please refresh the page, there has been an error: ${error.message}`;
+      this.displayErrorMessage(`Please refresh the page, there has been an error: ${error.message}`);
     }
     this.contactList.resetSearchCriteria();
     this.contactList.populateTagsFieldset();
     this.contactList.reloadContactList();
     this.displayContactList();
+  }
+
+  displayUserMessage(msg) {
+    this.$userMessage.textContent = msg;
+  }
+
+  displayErrorMessage(msg) {
+    this.$errorMessage.textContent = msg;
+  }
+
+  clearUserMessage() {
+    this.$userMessage.textContent = '';
+  }
+  
+  clearErrorMessage() {
+    this.$errorMessage.textContent = '';
   }
 }
 

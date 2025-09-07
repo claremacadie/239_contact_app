@@ -59,7 +59,7 @@ export default class ContactList {
   displayContacts() {
       this.$listDiv.innerHTML = '';
       if (this.filteredContacts.length === 0) {
-        this.app.$userMessage.textContent = 'There are no contacts meeting those search criteria.'
+        this.app.displayUserMessage('There are no contacts meeting those search criteria.');
       } else {
         this.filteredContacts.forEach(contact => {
           this.$listDiv.append(contact.$li);
