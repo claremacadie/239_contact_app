@@ -22,6 +22,7 @@ export default class App {
     this.contactDBAPI = new ContactDBAPI(this.url);
 
     try {
+      this.displayUserMessage('Loading contacts…');
       this.allContacts = await this.getAllContacts();
       this.tagOptions = this.#getTagOptions();
       
@@ -33,6 +34,8 @@ export default class App {
       this.#configureHTML();
     } catch(error) {
         this.handleError(error, 'Could not load contacts.');
+    } finally {
+      this.clearUserMessage();
     }
   }
 
@@ -53,7 +56,7 @@ export default class App {
     this.$errorMessage.textContent = '';
   }
 
-  handleError(error) {
+  handleError(error, msg='Something went wrong. Please try again.') {
     if (error instanceof ValidationError) {
       this.displayErrorMessage(error.message);
     } else if (error instanceof HttpError) {
@@ -63,7 +66,7 @@ export default class App {
       this.displayUserMessage('Request aborted.');
     } else {
       console.error(error);
-      this.displayErrorMessage('Something went wrong. Please try again.');
+      this.displayErrorMessage(msg);
     }
   }
 
@@ -152,10 +155,6 @@ export default class App {
 
 /*
 To do:
-- Add loading indicators when fetch requests are happening
-
-- create test framework
-
 - In app.js, setInterval to: 
   - fetch allContacts
   - reset tagOptions

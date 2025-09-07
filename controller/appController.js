@@ -70,8 +70,10 @@ export default class AppController {
     event.preventDefault();
 
     try {
+      this.app.displayUserMessage("Validating inputs...");
       let data = this.#extractData(new FormData(this.$form));
       this.#validateInputs(data);  
+      this.app.displayUserMessage("Adding new contact...");
       let dataToSend = this.#formatDataToSend(data);
       let response = await this.contactDBAPI.postNewContactData(dataToSend);
       this.contactForm.$form.reset();
@@ -79,6 +81,8 @@ export default class AppController {
       await this.app.resetContactListDisplay();
     } catch(error) {
       this.app.handleError(error);
+    } finally {
+      this.app.clearUserMessage();
     }
   }
 
@@ -88,7 +92,9 @@ export default class AppController {
     let contactId = target.dataset.contactId;
     let data = this.#extractData(new FormData(this.$form));
     try {
+      this.app.displayUserMessage("Validating inputs...");
       this.#validateInputs(data);  
+      this.app.displayUserMessage("Updating contact...");
       let dataToSend = this.#formatDataToSendWithId(data, contactId);
       let response = await this.contactDBAPI.updateContactData(dataToSend, contactId);
       this.contactForm.$form.reset();
@@ -96,6 +102,8 @@ export default class AppController {
       await this.app.resetContactListDisplay();
     } catch(error) {
       this.app.handleError(error);
+    } finally {
+      this.app.clearUserMessage();
     }
   }
   
@@ -112,6 +120,7 @@ export default class AppController {
 
     if (!confirm(`Are you sure you want to delete: ${contactFullName}`)) return;
     try {
+      this.app.displayUserMessage("Deleting contact...");
       await this.contactDBAPI.deleteContact(contactId);
       this.app.displayUserMessage(`${contactFullName} has been deleted.`);
       await this.app.resetContactListDisplay();
@@ -119,8 +128,11 @@ export default class AppController {
       if (error instanceof HttpError) {
         this.app.displayErrorMessage(`Delete failed for contact id = ${contactId} (${error.status}): ${error.message}`);
       } else {
-        this.app.handleError(err, `Delete failed for ${contactFullName}.`);
+        console.error(error);
+        this.app.handleError(error, `Delete failed for ${contactFullName}.`);
       }
+    } finally {
+      this.app.clearUserMessage();
     }
   }
 
