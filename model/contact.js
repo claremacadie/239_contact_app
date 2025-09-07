@@ -19,15 +19,13 @@ export default class Contact {
       this.$tagsDiv = document.createElement('div');
   
       this.$buttonsDiv = document.createElement('div');
-      this.$editButton = document.createElement('button');
-      this.$deleteButton = document.createElement('button');
   
       this.createHTML();
       this.populateHTML();
     }
   
     matchName(searchText) {
-      return this.name.toLowerCase().match(searchText);
+      return this.full_name.toLowerCase().match(searchText);
     }
   
     matchTags(tags) {
@@ -54,11 +52,19 @@ export default class Contact {
     }
   
     addButtonsDivHTML() {
-      this.$editButton.textContent = 'Edit';
-      this.$editButton.classList.add('edit-button');
-      this.$deleteButton.textContent = 'Delete';
-      this.$deleteButton.classList.add('delete-button');
-      this.$buttonsDiv.append(this.$editButton, this.$deleteButton);
+      let editButton = document.createElement('button');
+      editButton.textContent = 'Edit';
+      editButton.classList.add('edit-contact');
+      editButton.dataset.contactId = this.id;
+      editButton.setAttribute('type', 'button');
+
+      let deleteButton = document.createElement('button');
+      deleteButton.textContent = 'Delete';
+      deleteButton.classList.add('delete-contact');
+      deleteButton.dataset.contactId = this.id;
+      deleteButton.setAttribute('type', 'button');
+
+      this.$buttonsDiv.append(editButton, deleteButton);
     }
   
     createHTML() {

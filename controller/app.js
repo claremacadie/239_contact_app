@@ -118,8 +118,21 @@ export default class App {
 
 /*
 To do:
-  - Add there are no contacts to display when filtering removes everything!
   - Add loading indicators when fetch requests are happening
+  - Consider extracting some of the longer methods like createHTML into smaller, more focused functions. For example, in ContactForm, you could break down the form creation into separate methods for each section.
+  - Create a generic fetch request function, with error handling
+
+  - Be more specific about which errors to catch and re-throw versus which ones to handle directly.
+    - How might you distinguish between a network connectivity issue versus a "contact not found" error from your API server?
+
+      Form Validation vs. System Errors
+      In your ContactForm class, consider separating validation errors (which should be shown to users) from unexpected system errors (which might need to be logged differently).
+
+      Re-throwing vs. Direct Handling
+      Think about the difference between errors that should bubble up to higher-level handlers versus ones that should be handled immediately. For example, if a contact fails to save due to validation issues, should that error be handled right in the form, or passed up to the calling code?
+
+      Next Step
+      Start by looking at your ContactDBAPI class methods - can you identify which specific error conditions you want to handle differently based on the type of problem that occurred? Look at the `deleteContact` method.
 
   - In app.js, setInterval to: 
     - fetch allContacts
@@ -128,5 +141,7 @@ To do:
     - update tag checkboxes in contactForm
 
   - Use debounce to cancel requests if another one comes in?
+
+  - Add some timeouts to cancel requests if they take too long
 */
 

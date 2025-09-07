@@ -6,24 +6,35 @@ export default class ContactForm {
 
   init() {
     this.$form = document.createElement('form');
+    this.$submitButton = document.createElement('button');
+    this.$updateButton = document.createElement('button');
     this.$cancelButton = document.createElement('button');
+    this.$nameInput = document.createElement('input');
+    this.$emailInput = document.createElement('input');
+    this.$phoneInput = document.createElement('input');
+    this.$tagsFieldset = document.createElement('fieldset');
 
     this.createHTML();
     this.populateHTML();
   }
 
   createHTML() {
-    let nameLabel = this.createLabelHTML("Full name:", 'full_name', 'text');
-    let emailLabel = this.createLabelHTML("Email address:", 'email', 'email');
-    let phoneLabel = this.createLabelHTML("Telephone number:", 'phone_number', 'text');
-    let tagsFieldset = this.createTagsFieldsetHTML();
+    let nameLabel = this.createLabelHTML(this.$nameInput, "Full name:", 'full_name', 'text');
+    let emailLabel = this.createLabelHTML(this.$emailInput, "Email address:", 'email', 'email');
+    let phoneLabel = this.createLabelHTML(this.$phoneInput, "Telephone number:", 'phone_number', 'text');
+    this.$tagsFieldset.className = 'tags';
+    this.populateTagsFieldsetHTML();
     let tagsLabel = this.createTagsLabelHTML();
-    let submitButton = this.createSubmitButtonHTML();
 
-    this.$form.append(nameLabel, emailLabel, phoneLabel, tagsFieldset, tagsLabel, submitButton, this.$cancelButton);
+    this.$form.append(nameLabel, emailLabel, phoneLabel, this.$tagsFieldset, tagsLabel, this.$submitButton, this.$updateButton, this.$cancelButton);
   }
 
   populateHTML() {
+    this.$submitButton.textContent = 'Submit';
+    this.$submitButton.setAttribute('type', 'submit');
+    this.$updateButton.textContent = 'Update Contact';
+    this.$updateButton.setAttribute('type', 'button');
+    this.$updateButton.classList.add('hidden');
     this.$cancelButton.textContent = 'Cancel';
     this.$cancelButton.setAttribute('type', 'button');
 
@@ -31,24 +42,21 @@ export default class ContactForm {
     this.$form.setAttribute('method', 'POST');
   }
 
-  createLabelHTML(labelText, inputName, inputType) {
+  createLabelHTML($input, labelText, inputName, inputType) {
     let label = document.createElement('label');
     label.textContent = labelText;
-    let input = document.createElement('input');
-    input.name = inputName;
-    input.setAttribute('type', inputType);
-    if (inputName === 'full_name') input.required = true;
-    label.append(input);
+    $input.name = inputName;
+    $input.setAttribute('type', inputType);
+    if (inputName === 'full_name') $input.required = true;
+    label.append($input);
     return label;
   }
 
-  createTagsFieldsetHTML() {
-    let tagsFieldset = document.createElement('fieldset');
-    tagsFieldset.className = 'tags';
-    
+  populateTagsFieldsetHTML() {
+    this.$tagsFieldset.innerHTML = '';
     let legend = document.createElement('legend');
     legend.textContent = 'Select tags:';
-    tagsFieldset.append(legend);
+    this.$tagsFieldset.append(legend);
 
     this.app.tagOptions.forEach(tagOption => {
       let label = document.createElement('label');
@@ -59,10 +67,8 @@ export default class ContactForm {
       input.setAttribute('value', tagOption);
       label.append(input, labelText);
 
-      tagsFieldset.append(label);
+      this.$tagsFieldset.append(label);
     });
-
-    return tagsFieldset;
   }
 
   createTagsLabelHTML() {
@@ -75,10 +81,22 @@ export default class ContactForm {
     return tagsLabel;
   }
 
-  createSubmitButtonHTML() {
-    let submitButton = document.createElement('button');
-    submitButton.textContent = 'Submit';
-    submitButton.setAttribute('type', 'submit');
-    return submitButton;
+  setFormToAddContact() {
+    this.$updateButton.classList.add('hidden');
+    this.$submitButton.classList.remove('hidden');
+  }
+
+  setFormToEditContact(contact) {
+    this.$updateButton.dataset.contactId = contact.id;
+    this.$nameInput.value = contact.full_name;
+    this.$emailInput.value = contact.email;
+    this.$phoneInput.value = contact.phone_number;
+
+    [...this.$tagsFieldset.querySelectorAll('input')].forEach(tagInput => {
+      if (contact.tags.includes(tagInput.value)) tagInput.checked = true;
+    });
+
+    this.$updateButton.classList.remove('hidden');
+    this.$submitButton.classList.add('hidden');
   }
 }

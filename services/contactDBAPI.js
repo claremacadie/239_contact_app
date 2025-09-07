@@ -34,4 +34,35 @@ class ContactDBAPI {
       throw new Error(error);
     }
   }
+
+  async updateContactData(data, contactId) {
+    let path = `/contacts/${contactId}`;
+    let method = 'PUT';
+    try {
+      let response = await fetch(this.url + path, {
+        'method': method,
+        'body': data,
+        'headers': {
+          'Content-Type': 'application/json',
+        }
+      });
+      if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+      return await response.json();
+    } catch(error) {
+      throw new Error(error);
+    }
+  }
+
+  async deleteContact(contactId) {
+    let path = "/contacts";
+    let method = 'DELETE';
+    try {
+      let response = await fetch(this.url + path + `/${contactId}`, {
+        'method': method,
+      });
+      if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+    } catch(error) {
+      throw new Error(error);
+    }
+  }
 }

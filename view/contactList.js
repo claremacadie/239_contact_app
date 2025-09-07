@@ -28,6 +28,8 @@ export default class ContactList {
       this.$searchInput.className = 'search';
       this.$searchInput.setAttribute('type', 'text');
       this.$searchInput.setAttribute('placeholder', 'Search');
+
+      this.$tagsFieldset.className = 'tags';
   }
 
   populateHTML() {
@@ -36,13 +38,12 @@ export default class ContactList {
   }
 
   populateTagsFieldset() {
-      this.$tagsFieldset.className = 'tags';
-      
-      let legend = document.createElement('legend');
-      legend.textContent = 'Select tags:';
-      this.$tagsFieldset.append(legend);
+    this.$tagsFieldset.innerHTML = '';
+    let legend = document.createElement('legend');
+    legend.textContent = 'Select tags:';
+    this.$tagsFieldset.append(legend);
 
-      this.app.tagOptions.forEach(tagOption => {
+    this.app.tagOptions.forEach(tagOption => {
       let label = document.createElement('label');
       let labelText = document.createTextNode(tagOption);
       let input = document.createElement('input');
@@ -52,21 +53,25 @@ export default class ContactList {
       label.append(input, labelText);
 
       this.$tagsFieldset.append(label);
-      });
+    });
   }
 
   displayContacts() {
       this.$listDiv.innerHTML = '';
-      this.filteredContacts.forEach(contact => {
-      this.$listDiv.append(contact.$li);
-      });
+      if (this.filteredContacts.length === 0) {
+        this.app.$userMessage.textContent = 'There are no contacts meeting those search criteria.'
+      } else {
+        this.filteredContacts.forEach(contact => {
+          this.$listDiv.append(contact.$li);
+        });
+      }
   }
 
   filterContacts() {
       if (this.searchCriteria['full_name'] === '') {
       this.filteredContacts = this.app.allContacts;
       } else {
-      this.filteredContacts = this.app.allContacts.filter(contactObj => contactObj.matchName(this.searchCriteria['name']));
+      this.filteredContacts = this.app.allContacts.filter(contactObj => contactObj.matchName(this.searchCriteria['full_name']));
       }
 
       if (this.searchCriteria['tags'].length === 0) {
