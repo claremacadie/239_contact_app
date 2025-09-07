@@ -77,7 +77,6 @@ export default class AppController {
       this.app.displayUserMessage(`New contact added: ${response.full_name}`);
       await this.app.resetContactListDisplay();
     } catch(error) {
-      // Filter the error type to figure out whether to console.log (e.g. method doesn't exist) or display to user (e.g. input fields are wrong)
       if (error instanceof ValidationError) {
         this.app.displayErrorMessage(error.message);
         return;
@@ -100,8 +99,12 @@ export default class AppController {
       this.app.displayUserMessage(`Contact updated: ${response.full_name}`);
       await this.app.resetContactListDisplay();
     } catch(error) {
+      if (error instanceof ValidationError) {
+        this.app.displayErrorMessage(error.message);
+        return;
+      }
       console.log(error.message);
-      this.app.displayErrorMessage(error.message);
+      this.app.displayErrorMessage('Something went wrong. Please try again.');
     }
   }
   

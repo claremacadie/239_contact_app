@@ -1,7 +1,6 @@
 export default class ValidationError extends Error { 
-  constructor(message, fields = []) {
+  constructor(message) {
     super(message);
     this.name = 'ValidationError';
-    this.fields = fields; // optional: ['Email','Telephone number']
   }
 }
