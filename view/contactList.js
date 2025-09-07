@@ -20,7 +20,8 @@ export default class ContactList {
   }
 
   // ---------- public API ----------
-  resetSearchCriteria() {
+  resetSearch() {
+    this.$searchInput.value = '';
     this.searchCriteria = {'full_name': '', 'tags': []};
   }
 

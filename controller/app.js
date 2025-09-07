@@ -3,6 +3,9 @@ import ContactList from '../view/contactList.js';
 import ContactForm from '../view/contactForm.js';
 import ContactDBAPI from '../services/contactDBAPI.js';
 import AppController from './appController.js';
+import ValidationError from '../utils/validationError.js';
+import HttpError from '../utils/httpError.js';
+
 
 export default class App {
   constructor(url) {
@@ -29,7 +32,7 @@ export default class App {
       this.#createHTML();
       this.#configureHTML();
     } catch(error) {
-      this.displayErrorMessage(`Please refresh the page, there has been an error: ${error.message}`);
+        this.handleError(err, 'Could not load contacts.');
     }
   }
 
@@ -50,21 +53,31 @@ export default class App {
     this.$errorMessage.textContent = '';
   }
 
+  handleError(error) {
+    if (error instanceof ValidationError) {
+      this.displayErrorMessage(error.message);
+    } else if (error instanceof HttpError) {
+      this.displayErrorMessage(`Request failed (${err.status}): ${error.message}`);
+      return;
+    } else if (error?.name === 'AbortError') {
+      this.displayUserMessage('Request aborted.');
+    } else {
+      console.error(error);
+      this.displayErrorMessage('Something went wrong. Please try again.');
+    }
+  }
+
   // -- Contacts --
   async getAllContacts() {
-    try {
-      let contactsArr = await this.contactDBAPI.fetchContacts();
-      return contactsArr
-        .map(contact => new Contact(contact))
-        .sort((a, b) => {
-          if (a.full_name.toLowerCase() < b.full_name.toLowerCase()) return -1;
-          if (a.full_name.toLowerCase() > b.full_name.toLowerCase()) return 1;
-          return 0;
-        }
-      );
-    } catch(error) {
-      throw new Error(error);
-    }
+    let contactsArr = await this.contactDBAPI.fetchContacts();
+    return contactsArr
+      .map(contact => new Contact(contact))
+      .sort((a, b) => {
+        if (a.full_name.toLowerCase() < b.full_name.toLowerCase()) return -1;
+        if (a.full_name.toLowerCase() > b.full_name.toLowerCase()) return 1;
+        return 0;
+      }
+    )
   }
 
   getContactById(id) {
@@ -84,9 +97,9 @@ export default class App {
       this.allContacts = await this.getAllContacts();
       this.tagOptions = this.#getTagOptions();
     } catch(error) {
-      this.displayErrorMessage(`Please refresh the page, there has been an error: ${error.message}`);
+      this.handleError(error, 'Please refresh the page, there has been an error.');
     }
-    this.contactList.resetSearchCriteria();
+    this.contactList.resetSearch();
     this.contactList.renderTagsFieldset();
     this.contactList.reloadContactList();
     this.displayContactList();
@@ -139,32 +152,19 @@ export default class App {
 
 /*
 To do:
-- Think about error handling outside of fetch - if there are errors in method names, this is displayed to the user. Create an AppError class?
+- Create a generic fetch request function, with error handling
+- Add loading indicators when fetch requests are happening
 
 - create test framework
 
-- Create a generic fetch request function, with error handling
-  - Add loading indicators when fetch requests are happening
-  - Be more specific about which errors to catch and re-throw versus which ones to handle directly.
-    - How might you distinguish between a network connectivity issue versus a "contact not found" error from your API server?
+- In app.js, setInterval to: 
+  - fetch allContacts
+  - reset tagOptions
+  - update tag checkboxes in contactList
+  - update tag checkboxes in contactForm
 
-      Form Validation vs. System Errors
-      In your ContactForm class, consider separating validation errors (which should be shown to users) from unexpected system errors (which might need to be logged differently).
+- Use debounce to cancel requests if another one comes in?
 
-      Re-throwing vs. Direct Handling
-      Think about the difference between errors that should bubble up to higher-level handlers versus ones that should be handled immediately. For example, if a contact fails to save due to validation issues, should that error be handled right in the form, or passed up to the calling code?
-
-      Next Step
-      Start by looking at your ContactDBAPI class methods - can you identify which specific error conditions you want to handle differently based on the type of problem that occurred? Look at the `deleteContact` method.
-
-  - In app.js, setInterval to: 
-    - fetch allContacts
-    - reset tagOptions
-    - update tag checkboxes in contactList
-    - update tag checkboxes in contactForm
-
-  - Use debounce to cancel requests if another one comes in?
-
-  - Add some timeouts to cancel requests if they take too long
+- Add some timeouts to cancel requests if they take too long
 */
 

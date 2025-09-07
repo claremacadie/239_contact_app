@@ -1,5 +1,5 @@
-import HttpError from '../utils/httpError.js';
 import ValidationError from '../utils/validationError.js';
+import HttpError from '../utils/httpError.js';
 
 export default class AppController {
   constructor(app) {
@@ -68,8 +68,9 @@ export default class AppController {
   // -- ContactForm --
   async #handleFormSubmit(event) {
     event.preventDefault();
-    let data = this.#extractData(new FormData(this.$form));
+
     try {
+      let data = this.#extractData(new FormData(this.$form));
       this.#validateInputs(data);  
       let dataToSend = this.#formatDataToSend(data);
       let response = await this.contactDBAPI.postNewContactData(dataToSend);
@@ -77,12 +78,7 @@ export default class AppController {
       this.app.displayUserMessage(`New contact added: ${response.full_name}`);
       await this.app.resetContactListDisplay();
     } catch(error) {
-      if (error instanceof ValidationError) {
-        this.app.displayErrorMessage(error.message);
-        return;
-      }
-      console.log(error.message);
-      this.app.displayErrorMessage('Something went wrong. Please try again.');
+      this.app.handleError(error);
     }
   }
 
@@ -99,12 +95,7 @@ export default class AppController {
       this.app.displayUserMessage(`Contact updated: ${response.full_name}`);
       await this.app.resetContactListDisplay();
     } catch(error) {
-      if (error instanceof ValidationError) {
-        this.app.displayErrorMessage(error.message);
-        return;
-      }
-      console.log(error.message);
-      this.app.displayErrorMessage('Something went wrong. Please try again.');
+      this.app.handleError(error);
     }
   }
   
@@ -125,7 +116,11 @@ export default class AppController {
       this.app.displayUserMessage(`${contactFullName} has been deleted.`);
       await this.app.resetContactListDisplay();
     } catch(error) {
-      this.app.displayErrorMessage(`Delete failed for contact id = ${contactId}: ${error.message}`);
+      if (error instanceof HttpError) {
+        this.app.displayErrorMessage(`Delete failed for contact id = ${contactId} (${error.status}): ${error.message}`);
+      } else {
+        this.app.handleError(err, `Delete failed for ${contactFullName}.`);
+      }
     }
   }
 
