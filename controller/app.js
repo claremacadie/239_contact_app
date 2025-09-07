@@ -32,7 +32,7 @@ export default class App {
       this.#createHTML();
       this.#configureHTML();
     } catch(error) {
-        this.handleError(err, 'Could not load contacts.');
+        this.handleError(error, 'Could not load contacts.');
     }
   }
 
@@ -152,7 +152,6 @@ export default class App {
 
 /*
 To do:
-- Create a generic fetch request function, with error handling
 - Add loading indicators when fetch requests are happening
 
 - create test framework
