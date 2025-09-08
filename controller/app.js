@@ -144,14 +144,14 @@ handleError(err, msg='Something went wrong.') {
 
   #periodicDataFetch() {
     let ms = 60_000; 
-    this._refreshing = false;
-    this._intervalId = setInterval(async () => {
-      if (this._refreshing) return;
-      this._refreshing = true;
+    this.refreshing = false;
+    this.intervalId = setInterval(async () => {
+      if (this.refreshing) return;
+      this.refreshing = true;
       try {
         await this.#loadContactsAndTagOptions();
       } finally {
-        this._refreshing = false;
+        this.refreshing = false;
       }
     }, ms);
   }
