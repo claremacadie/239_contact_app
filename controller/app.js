@@ -7,7 +7,6 @@ import ValidationError from '../utils/validationError.js';
 import TimeoutError from '../utils/timeoutError.js';
 import HttpError from '../utils/httpError.js';
 
-
 export default class App {
   constructor(url) {
     this.url = url;
@@ -32,7 +31,7 @@ export default class App {
       
       this.#createHTML();
       this.#configureHTML();
-      this.#periodicDataFetch(); 
+      // this.#periodicDataFetch(); 
     } catch(error) {
         this.handleError(error, 'Could not load contacts.');
     } finally {
@@ -56,14 +55,6 @@ export default class App {
   clearErrorMessage() {
     this.$errorMessage.textContent = '';
   }
-
-handleError(err, msg='Something went wrong.') {
-  if (err instanceof TimeoutError) {
-    this.displayErrorMessage('Request timed out. Please try again.');
-    return;
-  }
-  // ...existing ValidationError / HttpError / AbortError branches
-}
 
   handleError(error, msg='Something went wrong. Please try again.') {
     if (error instanceof ValidationError) {
@@ -190,10 +181,3 @@ handleError(err, msg='Something went wrong.') {
     this.$contactFormDiv.classList.add('hidden');
   }
 }
-
-/*
-To do:
-- Use debounce to cancel requests if another one comes in?
-  https://launchschool.com/lessons/1b723bd0/assignments/72dd3b59 
-*/
-

@@ -1,5 +1,6 @@
 import ValidationError from '../utils/validationError.js';
 import HttpError from '../utils/httpError.js';
+import debounce from '../utils/debounce.js';
 
 export default class AppController {
   constructor(app) {
@@ -21,7 +22,10 @@ export default class AppController {
     this.$contactListDiv = this.contactList.$listDiv;
 
     this.contactDBAPI = this.app.contactDBAPI;
-  }
+
+    this.handleSearch = debounce(this.handleSearch.bind(this));
+    this.handleTagSelect = debounce(this.handleTagSelect.bind(this));
+  } 
 
   #bind() {
     this.$form.addEventListener('submit', this.#handleFormSubmit.bind(this));
@@ -29,13 +33,26 @@ export default class AppController {
     this.$updateContactButton.addEventListener('click', this.#handleUpdateContact.bind(this));
 
     this.$addContactButton.addEventListener('click', this.#handleAddContact.bind(this));
-    this.$searchInput.addEventListener('input', this.#handleSearch.bind(this));
-    this.$tagsFieldset.addEventListener('change', this.#handleTagSelect.bind(this));
+    this.$searchInput.addEventListener('input', this.handleSearch);
+    this.$tagsFieldset.addEventListener('change', this.handleTagSelect);
 
     this.$contactListDiv.addEventListener('click', this.#handleContactListClick.bind(this));
   }
 
-  // ---------- handlers ----------
+  // ---------- Public handlers ----------
+  handleSearch(event) {
+    event.preventDefault();
+    this.contactList.updateSearchTextCriteria();
+    this.contactList.reloadContactList();
+  }
+  
+  handleTagSelect(event) {
+    event.preventDefault();
+    this.contactList.updateTagSelectCriteria();
+    this.contactList.reloadContactList();
+  }
+
+  // ---------- Private handlers ----------
   // -- ContactList --
   #handleContactListClick(event) {
     let target = event.target;
@@ -51,18 +68,6 @@ export default class AppController {
   #handleAddContact(event) {
     event.preventDefault();
     this.app.displayAddContactForm();
-  }
-
-  #handleSearch(event) {
-    event.preventDefault();
-    this.contactList.updateSearchTextCriteria();
-    this.contactList.reloadContactList();
-  }
-  
-  #handleTagSelect(event) {
-    event.preventDefault();
-    this.contactList.updateTagSelectCriteria();
-    this.contactList.reloadContactList();
   }
   
   // -- ContactForm --
