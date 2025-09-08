@@ -4,6 +4,7 @@ import ContactForm from '../view/contactForm.js';
 import ContactDBAPI from '../services/contactDBAPI.js';
 import AppController from './appController.js';
 import ValidationError from '../utils/validationError.js';
+import TimeoutError from '../utils/timeoutError.js';
 import HttpError from '../utils/httpError.js';
 
 
@@ -56,6 +57,14 @@ export default class App {
     this.$errorMessage.textContent = '';
   }
 
+handleError(err, msg='Something went wrong.') {
+  if (err instanceof TimeoutError) {
+    this.displayErrorMessage('Request timed out. Please try again.');
+    return;
+  }
+  // ...existing ValidationError / HttpError / AbortError branches
+}
+
   handleError(error, msg='Something went wrong. Please try again.') {
     if (error instanceof ValidationError) {
       this.displayErrorMessage(error.message);
@@ -64,6 +73,8 @@ export default class App {
       return;
     } else if (error?.name === 'AbortError') {
       this.displayUserMessage('Request aborted.');
+    } else if (err instanceof TimeoutError) {
+      this.displayErrorMessage('Request timed out. Please try again.');
     } else {
       console.error(error);
       this.displayErrorMessage(msg);
@@ -184,8 +195,5 @@ export default class App {
 To do:
 - Use debounce to cancel requests if another one comes in?
   https://launchschool.com/lessons/1b723bd0/assignments/72dd3b59 
-
-- Add some timeouts to cancel requests if they take too long
-  Promise.race
 */
 

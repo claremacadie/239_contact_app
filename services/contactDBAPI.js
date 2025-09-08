@@ -1,4 +1,5 @@
 import HttpError from '../utils/httpError.js';
+import TimeoutError from '../utils/timeoutError.js';
 
 export default class ContactDBAPI {
   constructor(url) {
@@ -31,8 +32,17 @@ export default class ContactDBAPI {
   }
 
   // ---------- private API ----------
+  #setTimeoutPromise(ms) {
+    return new Promise((_, reject) => {
+      setTimeout(() => reject(new TimeoutError('Fetch request timed out')), ms);
+    });
+  }
+
   async #request(path, requestInitObj = {}, expectJson = true) {
-    const res = await fetch(`${this.url}${path}`, requestInitObj);
+    const res = await Promise.race([
+      fetch(`${this.url}${path}`, requestInitObj),
+      this.#setTimeoutPromise(2000),
+    ]);
 
     if (!res.ok) {
       let text = '';
@@ -42,7 +52,7 @@ export default class ContactDBAPI {
 
     if (!expectJson) return true;
 
-    if (res.status === 204) return null; // no content response
+    if (res.status === 204) return null;
     try { return await res.json(); } catch { return null; }
   }
 }
