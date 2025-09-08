@@ -23,8 +23,7 @@ export default class App {
 
     try {
       this.displayUserMessage('Loading contacts…');
-      this.allContacts = await this.getAllContacts();
-      this.tagOptions = this.#getTagOptions();
+      await this.#refreshContactsAndTags();
       
       this.contactList = new ContactList(this);
       this.contactForm = new ContactForm(this);
@@ -32,13 +31,14 @@ export default class App {
       
       this.#createHTML();
       this.#configureHTML();
+      this.#periodicDataFetch(); 
     } catch(error) {
         this.handleError(error, 'Could not load contacts.');
     } finally {
       this.clearUserMessage();
     }
   }
-
+  
   // ---------- public API ----------
   displayUserMessage(msg) {
     this.$userMessage.textContent = msg;
@@ -60,7 +60,7 @@ export default class App {
     if (error instanceof ValidationError) {
       this.displayErrorMessage(error.message);
     } else if (error instanceof HttpError) {
-      this.displayErrorMessage(`Request failed (${err.status}): ${error.message}`);
+      this.displayErrorMessage(`Request failed (${error.status}): ${error.message}`);
       return;
     } else if (error?.name === 'AbortError') {
       this.displayUserMessage('Request aborted.');
@@ -71,18 +71,6 @@ export default class App {
   }
 
   // -- Contacts --
-  async getAllContacts() {
-    let contactsArr = await this.contactDBAPI.fetchContacts();
-    return contactsArr
-      .map(contact => new Contact(contact))
-      .sort((a, b) => {
-        if (a.full_name.toLowerCase() < b.full_name.toLowerCase()) return -1;
-        if (a.full_name.toLowerCase() > b.full_name.toLowerCase()) return 1;
-        return 0;
-      }
-    )
-  }
-
   getContactById(id) {
     return this.allContacts.find(contact => Number(id) === Number(contact.id))
   }
@@ -97,8 +85,7 @@ export default class App {
   async resetContactListDisplay() {
     this.clearErrorMessage();
     try {
-      this.allContacts = await this.getAllContacts();
-      this.tagOptions = this.#getTagOptions();
+      await this.#refreshContactsAndTags();
     } catch(error) {
       this.handleError(error, 'Please refresh the page, there has been an error.');
     }
@@ -130,6 +117,55 @@ export default class App {
   }
 
   // ---------- private API ----------
+  async #refreshContactsAndTags() {
+    this.allContacts = await this.#getAllContacts();
+    this.tagOptions  = this.#getTagOptions();
+  }
+  
+  async #loadContactsAndTagOptions() {
+    try {
+      this.#refreshContactsAndTags()
+      console.log('Contacts reloaded');
+    } catch(error) {
+      console.error(`Could not load contacts, error: ${error}`);
+    }
+  }
+
+  #periodicDataFetch() {
+    let ms = 60_000; 
+    this._refreshing = false;
+    this._intervalId = setInterval(async () => {
+      if (this._refreshing) return;
+      this._refreshing = true;
+      try {
+        await this.#loadContactsAndTagOptions();
+      } finally {
+        this._refreshing = false;
+      }
+    }, ms);
+  }
+
+  async #getAllContacts() {
+    let contactsArr = await this.contactDBAPI.fetchContacts();
+    return contactsArr
+      .map(contact => new Contact(contact))
+      .sort((a, b) => {
+        if (a.full_name.toLowerCase() < b.full_name.toLowerCase()) return -1;
+        if (a.full_name.toLowerCase() > b.full_name.toLowerCase()) return 1;
+        return 0;
+      }
+    )
+  }
+
+  #getTagOptions() {
+    return this.allContacts.reduce((tagOptions, contact) => {
+      contact.tags.forEach(tag => {
+        if (!tagOptions.includes(tag)) tagOptions.push(tag);
+      });
+      return tagOptions;
+    }, []).sort();
+  }
+
   #createHTML() {
     this.$contactInterfaceDiv.append(
       this.contactList.$buttonDiv, 
@@ -142,27 +178,14 @@ export default class App {
   #configureHTML() {
     this.$contactFormDiv.classList.add('hidden');
   }
-
-  #getTagOptions() {
-    return this.allContacts.reduce((tagOptions, contact) => {
-      contact.tags.forEach(tag => {
-        if (!tagOptions.includes(tag)) tagOptions.push(tag);
-      });
-      return tagOptions;
-    }, []).sort();
-  }
 }
 
 /*
 To do:
-- In app.js, setInterval to: 
-  - fetch allContacts
-  - reset tagOptions
-  - update tag checkboxes in contactList
-  - update tag checkboxes in contactForm
-
 - Use debounce to cancel requests if another one comes in?
+  https://launchschool.com/lessons/1b723bd0/assignments/72dd3b59 
 
 - Add some timeouts to cancel requests if they take too long
+  Promise.race
 */
 
