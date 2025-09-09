@@ -42,12 +42,16 @@ export default class AppController {
   // ---------- Public handlers ----------
   handleSearch(event) {
     event.preventDefault();
+    this.app.clearUserMessage();
+    this.app.clearErrorMessage();
     this.contactList.updateSearchTextCriteria();
     this.contactList.reloadContactList();
   }
   
   handleTagSelect(event) {
     event.preventDefault();
+    this.app.clearUserMessage();
+    this.app.clearErrorMessage();
     this.contactList.updateTagSelectCriteria();
     this.contactList.reloadContactList();
   }
