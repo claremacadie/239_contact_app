@@ -12,7 +12,7 @@ Contact Manager
   App expects a backend at:
   http://localhost:3000/api/contacts
 
-  Make sure your server is running and reachable at that URL.
+  Make sure your server is running and reachable at that URL by going to contact_manager_node and running npm start.
 
 - Notes
   Turn Live Server off in VS Code (status bar should show Go Live).
