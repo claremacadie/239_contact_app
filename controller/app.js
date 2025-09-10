@@ -64,7 +64,7 @@ export default class App {
       return;
     } else if (error?.name === 'AbortError') {
       this.displayUserMessage('Request aborted.');
-    } else if (err instanceof TimeoutError) {
+    } else if (error instanceof TimeoutError) {
       this.displayErrorMessage('Request timed out. Please try again.');
     } else {
       console.error(error);
